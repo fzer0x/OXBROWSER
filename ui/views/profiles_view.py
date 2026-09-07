@@ -531,6 +531,18 @@ class ProfilesView(QWidget):
             QMessageBox.information(self, "Select Profile", "Please select at least one profile using checkboxes or table selection.")
             return
 
+        # Pre-flight engine readiness check across selected profiles
+        from ui.views.browser_download_dialog import BrowserDownloadDialog
+        checked_engines = set()
+        for pid in selected_profile_ids:
+            p_data = self.profile_manager.load_profile(pid)
+            if p_data:
+                e_type = p_data.get("engine", "camoufox").lower()
+                if e_type not in checked_engines:
+                    if not BrowserDownloadDialog.ensure_engine_ready(self, e_type):
+                        return
+                    checked_engines.add(e_type)
+
         from engine.window_grid import WindowGridCalculator
         positions = WindowGridCalculator.calculate_grid_positions(len(selected_profile_ids))
 
@@ -576,6 +588,13 @@ class ProfilesView(QWidget):
 
     @qasync.asyncSlot()
     async def _on_start_profile(self, profile_id: str):
+        prof = self.profile_manager.load_profile(profile_id)
+        if prof:
+            e_type = prof.get("engine", "camoufox")
+            from ui.views.browser_download_dialog import BrowserDownloadDialog
+            if not BrowserDownloadDialog.ensure_engine_ready(self, e_type):
+                return
+
         success, msg, _ = await self.launcher.launch_profile(profile_id)
         if not success:
             QMessageBox.warning(self, "Launch Error", f"Could not launch profile: {msg}")

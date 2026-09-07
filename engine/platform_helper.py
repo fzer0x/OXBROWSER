@@ -248,13 +248,16 @@ class PlatformHelper:
         - Checks local project camoufox directory (.exe on Windows, ELF on Linux)
         - Checks system PATH / user AppData
         """
-        # 1. Official pkgman cache
+        # 1. Official pkgman cache (safe check without auto-download)
         try:
-            from camoufox import pkgman
-            p = pkgman.launch_path()
-            if p and os.path.isfile(p):
-                if cls.is_windows() or os.access(p, os.X_OK):
-                    return p
+            from camoufox.multiversion import get_active_path
+            from camoufox.pkgman import Version, LAUNCH_FILE, OS_NAME
+            active = get_active_path()
+            if active and Version.from_path(active).is_supported():
+                launch_p = str(active / LAUNCH_FILE[OS_NAME])
+                if os.path.isfile(launch_p):
+                    if cls.is_windows() or os.access(launch_p, os.X_OK):
+                        return launch_p
         except Exception:
             pass
 

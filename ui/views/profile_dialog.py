@@ -9,6 +9,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, QTimer
 import qasync
 import os
+import sys
 import random
 import config
 from storage.profile_manager import ProfileManager
@@ -2669,7 +2670,8 @@ class ProfileDialog(QDialog):
         caps_layout.addWidget(self.caps_status_label, stretch=1)
 
         btn_box = QVBoxLayout()
-        self.install_deps_btn = QPushButton("⭍ Auto-Install Sandbox Dependencies")
+        btn_text = "⭍ Setup / Verify Sandbox Readiness" if sys.platform == "win32" else "⭍ Auto-Install Sandbox Dependencies"
+        self.install_deps_btn = QPushButton(btn_text)
         self.install_deps_btn.setProperty("class", "PrimaryButton")
         self.install_deps_btn.clicked.connect(self._on_install_sandbox_deps_clicked)
         btn_box.addWidget(self.install_deps_btn)
@@ -2689,9 +2691,14 @@ class ProfileDialog(QDialog):
 
         sb_layout.addWidget(QLabel("Isolation Type:"))
         self.sandbox_mode_combo = QComboBox()
-        self.sandbox_mode_combo.addItem("⊘ Native Host Process (Direct Local CDP - Primary Default)", "off")
-        self.sandbox_mode_combo.addItem("⭍ MicroVM Hardware Virtualization (Optional)", "microvm")
-        self.sandbox_mode_combo.addItem("⛢ Container Sandbox (Podman / Docker - Optional)", "container")
+        if sys.platform == "win32":
+            self.sandbox_mode_combo.addItem("⊘ Native Windows Process Sandbox (Direct Local CDP - Default)", "off")
+            self.sandbox_mode_combo.addItem("⛢ Container Sandbox (Docker Desktop / Podman - Optional)", "container")
+            self.sandbox_mode_combo.addItem("⭍ MicroVM Hardware Virtualization (Linux / WSL2 Only)", "microvm")
+        else:
+            self.sandbox_mode_combo.addItem("⊘ Native Host Process (Direct Local CDP - Primary Default)", "off")
+            self.sandbox_mode_combo.addItem("⭍ MicroVM Hardware Virtualization (Optional)", "microvm")
+            self.sandbox_mode_combo.addItem("⛢ Container Sandbox (Podman / Docker - Optional)", "container")
         sb_layout.addWidget(self.sandbox_mode_combo)
 
         sb_layout.addWidget(QLabel("MicroVM Engine:"))
@@ -2744,34 +2751,48 @@ class ProfileDialog(QDialog):
     def _refresh_caps_label(self):
         from engine.sandbox.sandbox_installer import SandboxInstaller
         caps = SandboxManager.check_system_capabilities()
-        has_runsc = SandboxInstaller.is_runsc_available()
-        status_text = (
-            f"• Cloud-Hypervisor: {'✓ Available' if caps.get('cloud_hypervisor') else ' Not Found'}\n"
-            f"• Firecracker MicroVM: {'✓ Available' if caps.get('firecracker') else ' Not Found'}\n"
-            f"• Virtiofs Daemon (virtiofsd): {'✓ Available' if caps.get('virtiofsd') else ' Not Found'}\n"
-            f"• KVM Hardware Virtualization (/dev/kvm): {'✓ Supported' if caps['kvm'] else ' Unsupported / Disabled'}\n"
-            f"• Ephemeral RAM Storage (tmpfs): {'✓ Available' if caps.get('tmpfs_ram') else ' Unsupported'}\n"
-            f"• Podman / Docker: {'✓ Available' if caps['podman'] or caps['docker'] else ' Not Found'}\n"
-            f"• gVisor Syscall Sandbox (runsc): {'✓ Available' if has_runsc else ' Not Found'}"
-        )
+        if sys.platform == "win32":
+            has_oci = caps.get("podman") or caps.get("docker")
+            has_wsl = caps.get("wsl")
+            status_text = (
+                f"• Windows Process Sandbox: ✓ Native Active (Direct Local CDP & Job Object)\n"
+                f"• Ephemeral RAM Storage: {'✓ Available (Auto-Shredded Temp RAM)' if caps.get('tmpfs_ram') else ' Unsupported'}\n"
+                f"• Camoufox C++ Engine: ✓ Stealth Hardened Native\n"
+                f"• Docker Desktop / Podman: {'✓ Available' if has_oci else ' Optional (Not Installed)'}\n"
+                f"• WSL2 Virtualization: {'✓ Supported' if has_wsl else ' Not Found'}\n"
+                f"• Linux KVM MicroVMs: N/A on Windows (Windows Process & Docker used)"
+            )
+        else:
+            has_runsc = SandboxInstaller.is_runsc_available()
+            status_text = (
+                f"• Cloud-Hypervisor: {'✓ Available' if caps.get('cloud_hypervisor') else ' Not Found'}\n"
+                f"• Firecracker MicroVM: {'✓ Available' if caps.get('firecracker') else ' Not Found'}\n"
+                f"• Virtiofs Daemon (virtiofsd): {'✓ Available' if caps.get('virtiofsd') else ' Not Found'}\n"
+                f"• KVM Hardware Virtualization (/dev/kvm): {'✓ Supported' if caps['kvm'] else ' Unsupported / Disabled'}\n"
+                f"• Ephemeral RAM Storage (tmpfs): {'✓ Available' if caps.get('tmpfs_ram') else ' Unsupported'}\n"
+                f"• Podman / Docker: {'✓ Available' if caps['podman'] or caps['docker'] else ' Not Found'}\n"
+                f"• gVisor Syscall Sandbox (runsc): {'✓ Available' if has_runsc else ' Not Found'}"
+            )
         if hasattr(self, "caps_status_label"):
             self.caps_status_label.setText(status_text)
 
     @qasync.asyncSlot()
     async def _on_install_sandbox_deps_clicked(self):
+        is_win = sys.platform == "win32"
         self.install_deps_btn.setEnabled(False)
-        self.install_deps_btn.setText("⌛ Installing Dependencies...")
+        self.install_deps_btn.setText("⌛ Verifying Environment..." if is_win else "⌛ Installing Dependencies...")
         try:
             ok, msg = await SandboxInstaller.install_missing_dependencies()
             if ok:
-                QMessageBox.information(self, "Installation Completed", f"Sandbox dependencies installed:\n{msg}")
+                title = "Windows Sandbox Ready" if is_win else "Installation Completed"
+                QMessageBox.information(self, title, f"Sandbox Status:\n\n{msg.replace(' | ', '\n')}")
             else:
                 QMessageBox.warning(self, "Installation Status", f"Result: {msg}")
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to install dependencies: {e}")
+            QMessageBox.critical(self, "Error", f"Failed to verify dependencies: {e}")
         finally:
             self.install_deps_btn.setEnabled(True)
-            self.install_deps_btn.setText("⭍ Auto-Install Sandbox Dependencies")
+            self.install_deps_btn.setText("⭍ Setup / Verify Sandbox Readiness" if is_win else "⭍ Auto-Install Sandbox Dependencies")
             self._refresh_caps_label()
 
     def _load_data(self):
@@ -3139,6 +3160,11 @@ class ProfileDialog(QDialog):
 
     @qasync.asyncSlot()
     async def _save_and_launch(self):
+        engine_type = self.profile_data.get("engine", "camoufox")
+        from ui.views.browser_download_dialog import BrowserDownloadDialog
+        if not BrowserDownloadDialog.ensure_engine_ready(self, engine_type):
+            return
+
         if not self._save_and_accept():
             return
         if self.launcher and self.profile_data.get("id"):

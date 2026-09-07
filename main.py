@@ -17,10 +17,13 @@ for pattern in venv_patterns:
             sys.path.insert(0, sp)
 
 import asyncio
-# Configure Windows event loop policy for optimal qasync & subprocess compatibility
-if sys.platform == "win32" and hasattr(asyncio, "WindowsSelectorEventLoopPolicy"):
+# Configure Windows event loop policy for optimal qasync & subprocess compatibility (Python < 3.14)
+if sys.platform == "win32" and sys.version_info < (3, 14):
     try:
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+        policy_cls = getattr(asyncio, "WindowsSelectorEventLoopPolicy", None)
+        set_policy = getattr(asyncio, "set_event_loop_policy", None)
+        if policy_cls and set_policy:
+            set_policy(policy_cls())
     except Exception:
         pass
 

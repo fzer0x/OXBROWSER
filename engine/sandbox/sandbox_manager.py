@@ -33,18 +33,23 @@ class SandboxManager:
     @staticmethod
     def check_system_capabilities() -> Dict[str, Any]:
         """Inspects host OS capabilities for Docker, Podman, Cloud-Hypervisor, Firecracker, Virtiofs, KVM, and Ephemeral RAM Storage."""
+        import sys
+        is_win = sys.platform == "win32"
         has_docker = check_cmd_available("docker")
         has_podman = check_cmd_available("podman")
-        has_ch = check_cmd_available("cloud-hypervisor")
-        has_fc = check_cmd_available("firecracker")
-        has_virtiofsd = VirtiofsDaemonManager.is_virtiofsd_available()
-        has_kvm = os.path.exists("/dev/kvm") and os.access("/dev/kvm", os.R_OK | os.W_OK)
-        has_xvfb = check_cmd_available("Xvfb")
+        has_wsl = is_win and (shutil.which("wsl") is not None)
+        has_ch = False if is_win else check_cmd_available("cloud-hypervisor")
+        has_fc = False if is_win else check_cmd_available("firecracker")
+        has_virtiofsd = False if is_win else VirtiofsDaemonManager.is_virtiofsd_available()
+        has_kvm = False if is_win else (os.path.exists("/dev/kvm") and os.access("/dev/kvm", os.R_OK | os.W_OK))
+        has_xvfb = False if is_win else check_cmd_available("Xvfb")
         has_qemu = check_cmd_available("qemu-system-x86_64")
         has_tmpfs = EphemeralStorageManager.is_tmpfs_supported()
 
         rec_mode = "container"
-        if (has_ch or has_fc) and has_kvm:
+        if is_win:
+            rec_mode = "off"  # Native Host Process / Direct Local CDP on Windows
+        elif (has_ch or has_fc) and has_kvm:
             rec_mode = "microvm"
         elif has_podman or has_docker or has_xvfb:
             rec_mode = "container"
@@ -59,5 +64,7 @@ class SandboxManager:
             "xvfb": has_xvfb,
             "qemu": has_qemu,
             "tmpfs_ram": has_tmpfs,
+            "wsl": has_wsl,
+            "is_windows": is_win,
             "recommended_mode": rec_mode
         }

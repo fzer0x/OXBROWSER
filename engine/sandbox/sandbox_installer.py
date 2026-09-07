@@ -14,15 +14,24 @@ class SandboxInstaller:
 
     @staticmethod
     def detect_package_manager() -> Optional[str]:
-        """Detects host system package manager (apt-get, dnf, pacman, zypper)."""
-        for pm in ["apt-get", "dnf", "pacman", "zypper"]:
+        """Detects host system package manager (winget/choco/scoop on Windows; apt-get, dnf, pacman, zypper on Linux)."""
+        candidates = ["winget", "choco", "scoop"] if sys.platform == "win32" else ["apt-get", "dnf", "pacman", "zypper"]
+        for pm in candidates:
             if shutil.which(pm):
                 return pm
         return None
 
     @staticmethod
     async def install_missing_dependencies() -> Tuple[bool, str]:
-        """Installs missing Xvfb, Podman, QEMU-KVM, Virtiofsd, Cloud-Hypervisor, and Firecracker packages."""
+        """Installs missing sandbox dependencies on Linux or verifies/prepares Windows isolation environment."""
+        if sys.platform == "win32":
+            return await SandboxInstaller._setup_windows_sandbox()
+        else:
+            return await SandboxInstaller._setup_linux_sandbox()
+
+    @staticmethod
+    async def _setup_linux_sandbox() -> Tuple[bool, str]:
+        """Installs missing Xvfb, Podman, QEMU-KVM, Virtiofsd, Cloud-Hypervisor, and Firecracker packages on Linux."""
         pm = SandboxInstaller.detect_package_manager()
 
         packages = []
@@ -114,189 +123,242 @@ class SandboxInstaller:
         return True, msg_summary
 
     @staticmethod
+    async def _setup_windows_sandbox() -> Tuple[bool, str]:
+        """Configures and verifies Windows isolation and browser engines."""
+        logger.info("[SandboxInstaller] Checking Windows isolation and sandbox readiness...")
+
+        status_items = []
+
+        # 1. Ensure Camoufox stealth browser is fetched and ready
+        cf_ok, cf_msg = await SandboxInstaller.ensure_camoufox_installed()
+        if cf_ok:
+            status_items.append("Camoufox C++ Hardened Engine: Ready")
+        else:
+            status_items.append(f"Camoufox Engine: Notice ({cf_msg})")
+
+        # 2. Verify Windows Ephemeral RAM Storage (Auto-wiped temp RAM disk)
+        from engine.sandbox.ephemeral_storage import EphemeralStorageManager
+        if EphemeralStorageManager.is_tmpfs_supported():
+            status_items.append("Ephemeral RAM Storage: Ready (Auto-Shredded Profile Storage)")
+        else:
+            status_items.append("Ephemeral RAM Storage: Unsupported")
+
+        # 3. Native Windows Process Isolation
+        status_items.append("Windows Process Isolation: Ready (Job Object / CDP Sandbox)")
+
+        # 4. Optional OCI Container Runtime (Docker Desktop / Podman)
+        has_podman = shutil.which("podman") is not None
+        has_docker = shutil.which("docker") is not None
+        has_wsl = shutil.which("wsl") is not None
+
+        if has_podman:
+            status_items.append("Container Engine: Podman Available")
+        elif has_docker:
+            status_items.append("Container Engine: Docker Desktop Available")
+        else:
+            status_items.append("Container Engine: Optional (Docker Desktop or 'winget install RedHat.Podman')")
+
+        if has_wsl:
+            status_items.append("WSL2: Available")
+
+        msg_summary = " | ".join(status_items)
+        logger.info(f"[SandboxInstaller] Windows Sandbox setup summary: {msg_summary}")
+        return True, msg_summary
+
+    @staticmethod
     async def install_cloud_hypervisor() -> Tuple[bool, str]:
         """Downloads and installs official Cloud-Hypervisor static binary."""
-        if shutil.which("cloud-hypervisor"):
-            return True, "Cloud-Hypervisor is already installed."
-
-        logger.info("[SandboxInstaller] Installing static Cloud-Hypervisor binary...")
-        url = "https://github.com/cloud-hypervisor/cloud-hypervisor/releases/latest/download/cloud-hypervisor"
-
-        try:
-            # 1. Try system-wide install to /usr/local/bin
-            sys_cmd = f"curl -sSL '{url}' -o /tmp/cloud-hypervisor && chmod +x /tmp/cloud-hypervisor && sudo mv /tmp/cloud-hypervisor /usr/local/bin/cloud-hypervisor"
-            proc = await asyncio.create_subprocess_shell(
-                sys_cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
-            await proc.communicate()
-
+        if sys.platform == "win32":
+            return False, "Linux-only hypervisor (not supported natively on Windows; use Native Process or Docker/WSL2)."
+        else:
             if shutil.which("cloud-hypervisor"):
-                logger.info("[SandboxInstaller] Cloud-Hypervisor successfully installed system-wide in /usr/local/bin/cloud-hypervisor")
-                return True, "Cloud-Hypervisor installed system-wide to /usr/local/bin/cloud-hypervisor"
+                return True, "Cloud-Hypervisor is already installed."
 
-            # 2. Local fallback to ~/.local/bin
-            user_bin = os.path.expanduser("~/.local/bin")
-            os.makedirs(user_bin, exist_ok=True)
-            user_ch = os.path.join(user_bin, "cloud-hypervisor")
+            logger.info("[SandboxInstaller] Installing static Cloud-Hypervisor binary...")
+            url = "https://github.com/cloud-hypervisor/cloud-hypervisor/releases/latest/download/cloud-hypervisor"
 
-            user_cmd = f"curl -sSL '{url}' -o '{user_ch}' && chmod +x '{user_ch}'"
-            proc_user = await asyncio.create_subprocess_shell(
-                user_cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
-            await proc_user.communicate()
+            try:
+                # 1. Try system-wide install to /usr/local/bin
+                sys_cmd = f"curl -sSL '{url}' -o /tmp/cloud-hypervisor && chmod +x /tmp/cloud-hypervisor && sudo mv /tmp/cloud-hypervisor /usr/local/bin/cloud-hypervisor"
+                proc = await asyncio.create_subprocess_shell(
+                    sys_cmd,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE
+                )
+                await proc.communicate()
 
-            if os.path.exists(user_ch):
-                if user_bin not in os.environ.get("PATH", ""):
-                    os.environ["PATH"] = user_bin + os.pathsep + os.environ.get("PATH", "")
-                logger.info(f"[SandboxInstaller] Cloud-Hypervisor installed to {user_ch}")
-                return True, f"Cloud-Hypervisor installed locally to {user_ch}"
+                if shutil.which("cloud-hypervisor"):
+                    logger.info("[SandboxInstaller] Cloud-Hypervisor successfully installed system-wide in /usr/local/bin/cloud-hypervisor")
+                    return True, "Cloud-Hypervisor installed system-wide to /usr/local/bin/cloud-hypervisor"
 
-            return False, "Failed to download Cloud-Hypervisor binary."
-        except Exception as e:
-            logger.error(f"[SandboxInstaller] Cloud-Hypervisor installation error: {e}")
-            return False, str(e)
+                # 2. Local fallback to ~/.local/bin
+                user_bin = os.path.expanduser("~/.local/bin")
+                os.makedirs(user_bin, exist_ok=True)
+                user_ch = os.path.join(user_bin, "cloud-hypervisor")
+
+                user_cmd = f"curl -sSL '{url}' -o '{user_ch}' && chmod +x '{user_ch}'"
+                proc_user = await asyncio.create_subprocess_shell(
+                    user_cmd,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE
+                )
+                await proc_user.communicate()
+
+                if os.path.exists(user_ch):
+                    if user_bin not in os.environ.get("PATH", ""):
+                        os.environ["PATH"] = user_bin + os.pathsep + os.environ.get("PATH", "")
+                    logger.info(f"[SandboxInstaller] Cloud-Hypervisor installed to {user_ch}")
+                    return True, f"Cloud-Hypervisor installed locally to {user_ch}"
+
+                return False, "Failed to download Cloud-Hypervisor binary."
+            except Exception as e:
+                logger.error(f"[SandboxInstaller] Cloud-Hypervisor installation error: {e}")
+                return False, str(e)
 
     @staticmethod
     async def install_firecracker() -> Tuple[bool, str]:
         """Downloads and installs official Firecracker MicroVM static binary."""
-        if shutil.which("firecracker"):
-            return True, "Firecracker is already installed."
-
-        logger.info("[SandboxInstaller] Installing static Firecracker binary...")
-        url = "https://github.com/firecracker-microvm/firecracker/releases/download/v1.7.0/firecracker-v1.7.0-x86_64.tgz"
-
-        try:
-            sys_cmd = (
-                f"curl -sSL '{url}' -o /tmp/firecracker.tgz && "
-                "tar -xzf /tmp/firecracker.tgz -C /tmp && "
-                "chmod +x /tmp/release-v1.7.0-x86_64/firecracker-v1.7.0-x86_64 && "
-                "sudo mv /tmp/release-v1.7.0-x86_64/firecracker-v1.7.0-x86_64 /usr/local/bin/firecracker"
-            )
-            proc = await asyncio.create_subprocess_shell(
-                sys_cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
-            await proc.communicate()
-
+        if sys.platform == "win32":
+            return False, "Firecracker MicroVM requires Linux KVM (unsupported natively on Windows; use Native Process or Docker/WSL2)."
+        else:
             if shutil.which("firecracker"):
-                logger.info("[SandboxInstaller] Firecracker successfully installed system-wide in /usr/local/bin/firecracker")
-                return True, "Firecracker installed system-wide to /usr/local/bin/firecracker"
+                return True, "Firecracker is already installed."
 
-            # Local user fallback
-            user_bin = os.path.expanduser("~/.local/bin")
-            os.makedirs(user_bin, exist_ok=True)
-            user_fc = os.path.join(user_bin, "firecracker")
+            logger.info("[SandboxInstaller] Installing static Firecracker binary...")
+            url = "https://github.com/firecracker-microvm/firecracker/releases/download/v1.7.0/firecracker-v1.7.0-x86_64.tgz"
 
-            user_cmd = (
-                f"curl -sSL '{url}' -o /tmp/firecracker.tgz && "
-                "tar -xzf /tmp/firecracker.tgz -C /tmp && "
-                f"cp /tmp/release-v1.7.0-x86_64/firecracker-v1.7.0-x86_64 '{user_fc}' && "
-                f"chmod +x '{user_fc}'"
-            )
-            proc_user = await asyncio.create_subprocess_shell(
-                user_cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
-            await proc_user.communicate()
+            try:
+                sys_cmd = (
+                    f"curl -sSL '{url}' -o /tmp/firecracker.tgz && "
+                    "tar -xzf /tmp/firecracker.tgz -C /tmp && "
+                    "chmod +x /tmp/release-v1.7.0-x86_64/firecracker-v1.7.0-x86_64 && "
+                    "sudo mv /tmp/release-v1.7.0-x86_64/firecracker-v1.7.0-x86_64 /usr/local/bin/firecracker"
+                )
+                proc = await asyncio.create_subprocess_shell(
+                    sys_cmd,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE
+                )
+                await proc.communicate()
 
-            if os.path.exists(user_fc):
-                if user_bin not in os.environ.get("PATH", ""):
-                    os.environ["PATH"] = user_bin + os.pathsep + os.environ.get("PATH", "")
-                logger.info(f"[SandboxInstaller] Firecracker installed to {user_fc}")
-                return True, f"Firecracker installed locally to {user_fc}"
+                if shutil.which("firecracker"):
+                    logger.info("[SandboxInstaller] Firecracker successfully installed system-wide in /usr/local/bin/firecracker")
+                    return True, "Firecracker installed system-wide to /usr/local/bin/firecracker"
 
-            return False, "Failed to download Firecracker binary."
-        except Exception as e:
-            logger.error(f"[SandboxInstaller] Firecracker installation error: {e}")
-            return False, str(e)
+                # Local user fallback
+                user_bin = os.path.expanduser("~/.local/bin")
+                os.makedirs(user_bin, exist_ok=True)
+                user_fc = os.path.join(user_bin, "firecracker")
+
+                user_cmd = (
+                    f"curl -sSL '{url}' -o /tmp/firecracker.tgz && "
+                    "tar -xzf /tmp/firecracker.tgz -C /tmp && "
+                    f"cp /tmp/release-v1.7.0-x86_64/firecracker-v1.7.0-x86_64 '{user_fc}' && "
+                    f"chmod +x '{user_fc}'"
+                )
+                proc_user = await asyncio.create_subprocess_shell(
+                    user_cmd,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE
+                )
+                await proc_user.communicate()
+
+                if os.path.exists(user_fc):
+                    if user_bin not in os.environ.get("PATH", ""):
+                        os.environ["PATH"] = user_bin + os.pathsep + os.environ.get("PATH", "")
+                    logger.info(f"[SandboxInstaller] Firecracker installed to {user_fc}")
+                    return True, f"Firecracker installed locally to {user_fc}"
+
+                return False, "Failed to download Firecracker binary."
+            except Exception as e:
+                logger.error(f"[SandboxInstaller] Firecracker installation error: {e}")
+                return False, str(e)
 
     @staticmethod
     def ensure_kvm_permissions() -> Tuple[bool, str]:
         """Checks /dev/kvm availability and user group permissions."""
-        if not os.path.exists("/dev/kvm"):
-            return False, "/dev/kvm device node does not exist. Ensure KVM virtualization is enabled in CPU BIOS/UEFI."
+        if sys.platform == "win32":
+            return False, "KVM (/dev/kvm) is a Linux kernel module. Windows uses Hyper-V and WSL2 architecture."
+        else:
+            if not os.path.exists("/dev/kvm"):
+                return False, "/dev/kvm device node does not exist. Ensure KVM virtualization is enabled in CPU BIOS/UEFI."
 
-        if os.access("/dev/kvm", os.R_OK | os.W_OK):
-            return True, "KVM hardware virtualization access confirmed (/dev/kvm R/W ok)."
+            if os.access("/dev/kvm", os.R_OK | os.W_OK):
+                return True, "KVM hardware virtualization access confirmed (/dev/kvm R/W ok)."
 
-        # Try adding current user to kvm group if permission denied
-        try:
-            user = os.environ.get("USER", os.environ.get("LOGNAME", ""))
-            if user:
-                subprocess.run(["sudo", "usermod", "-aG", "kvm", user], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                subprocess.run(["sudo", "chmod", "666", "/dev/kvm"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                if os.access("/dev/kvm", os.R_OK | os.W_OK):
-                    return True, "KVM hardware virtualization access granted."
-        except Exception:
-            pass
+            # Try adding current user to kvm group if permission denied
+            try:
+                user = os.environ.get("USER", os.environ.get("LOGNAME", ""))
+                if user:
+                    subprocess.run(["sudo", "usermod", "-aG", "kvm", user], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    subprocess.run(["sudo", "chmod", "666", "/dev/kvm"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    if os.access("/dev/kvm", os.R_OK | os.W_OK):
+                        return True, "KVM hardware virtualization access granted."
+            except Exception:
+                pass
 
-        return False, "Permission denied for /dev/kvm. Run: sudo usermod -aG kvm $USER && sudo chmod 666 /dev/kvm"
+            return False, "Permission denied for /dev/kvm. Run: sudo usermod -aG kvm $USER && sudo chmod 666 /dev/kvm"
 
     @staticmethod
     async def install_gvisor() -> Tuple[bool, str]:
         """Downloads and installs official static gVisor (runsc) binary."""
-        if shutil.which("runsc"):
-            return True, "gVisor (runsc) is already installed."
-
-        logger.info("[SandboxInstaller] Installing static gVisor (runsc) binary...")
-        url = "https://storage.googleapis.com/gvisor/releases/release/latest/x86_64/runsc"
-
-        try:
-            sys_cmd = f"curl -sSL '{url}' -o /tmp/runsc && chmod +x /tmp/runsc && sudo mv /tmp/runsc /usr/local/bin/runsc"
-            proc = await asyncio.create_subprocess_shell(
-                sys_cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
-            await proc.communicate()
-
+        if sys.platform == "win32":
+            return False, "gVisor (runsc) requires Linux kernel namespaces (use WSL2 on Windows)."
+        else:
             if shutil.which("runsc"):
-                logger.info("[SandboxInstaller] gVisor (runsc) successfully installed system-wide in /usr/local/bin/runsc")
-                return True, "gVisor (runsc) installed system-wide to /usr/local/bin/runsc"
+                return True, "gVisor (runsc) is already installed."
 
-            user_bin = os.path.expanduser("~/.local/bin")
-            os.makedirs(user_bin, exist_ok=True)
-            user_runsc = os.path.join(user_bin, "runsc")
+            logger.info("[SandboxInstaller] Installing static gVisor (runsc) binary...")
+            url = "https://storage.googleapis.com/gvisor/releases/release/latest/x86_64/runsc"
 
-            user_cmd = f"curl -sSL '{url}' -o '{user_runsc}' && chmod +x '{user_runsc}'"
-            proc_user = await asyncio.create_subprocess_shell(
-                user_cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
-            await proc_user.communicate()
+            try:
+                sys_cmd = f"curl -sSL '{url}' -o /tmp/runsc && chmod +x /tmp/runsc && sudo mv /tmp/runsc /usr/local/bin/runsc"
+                proc = await asyncio.create_subprocess_shell(
+                    sys_cmd,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE
+                )
+                await proc.communicate()
 
-            if os.path.exists(user_runsc):
-                if user_bin not in os.environ.get("PATH", ""):
-                    os.environ["PATH"] = user_bin + os.pathsep + os.environ.get("PATH", "")
-                logger.info(f"[SandboxInstaller] gVisor (runsc) installed to {user_runsc}")
-                return True, f"gVisor (runsc) installed locally to {user_runsc}"
+                if shutil.which("runsc"):
+                    logger.info("[SandboxInstaller] gVisor (runsc) successfully installed system-wide in /usr/local/bin/runsc")
+                    return True, "gVisor (runsc) installed system-wide to /usr/local/bin/runsc"
 
-            return False, "Failed to download gVisor binary."
-        except Exception as e:
-            logger.error(f"[SandboxInstaller] gVisor installation error: {e}")
-            return False, str(e)
+                user_bin = os.path.expanduser("~/.local/bin")
+                os.makedirs(user_bin, exist_ok=True)
+                user_runsc = os.path.join(user_bin, "runsc")
+
+                user_cmd = f"curl -sSL '{url}' -o '{user_runsc}' && chmod +x '{user_runsc}'"
+                proc_user = await asyncio.create_subprocess_shell(
+                    user_cmd,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE
+                )
+                await proc_user.communicate()
+
+                if os.path.exists(user_runsc):
+                    if user_bin not in os.environ.get("PATH", ""):
+                        os.environ["PATH"] = user_bin + os.pathsep + os.environ.get("PATH", "")
+                    logger.info(f"[SandboxInstaller] gVisor (runsc) installed to {user_runsc}")
+                    return True, f"gVisor (runsc) installed locally to {user_runsc}"
+
+                return False, "Failed to download gVisor binary."
+            except Exception as e:
+                logger.error(f"[SandboxInstaller] gVisor installation error: {e}")
+                return False, str(e)
 
     @staticmethod
     async def ensure_camoufox_installed() -> Tuple[bool, str]:
         """Ensures the camoufox Python library and browser binary are fetched and ready."""
         try:
-            import camoufox
-            proc = await asyncio.create_subprocess_exec(
-                sys.executable, "-m", "camoufox", "fetch",
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
-            stdout, stderr = await proc.communicate()
-            if proc.returncode == 0:
-                return True, "Camoufox C++ engine is ready and updated."
-            return True, f"Camoufox installed (fetch notice: {stderr.decode()[:100]})"
+            from engine.browser_downloader import BrowserDownloader
+            is_ready, msg = BrowserDownloader.is_engine_installed("camoufox")
+            if is_ready:
+                return True, msg
+
+            logger.info("[SandboxInstaller] Camoufox missing or outdated. Downloading via BrowserDownloader...")
+            ok, dl_msg = await asyncio.to_thread(BrowserDownloader.download_camoufox)
+            return ok, dl_msg
         except ImportError:
             logger.info("[SandboxInstaller] Installing camoufox python package...")
             proc = await asyncio.create_subprocess_exec(
@@ -308,13 +370,9 @@ class SandboxInstaller:
             if proc.returncode != 0:
                 return False, f"Failed to install camoufox via pip: {stderr.decode()}"
 
-            proc_fetch = await asyncio.create_subprocess_exec(
-                sys.executable, "-m", "camoufox", "fetch",
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
-            await proc_fetch.communicate()
-            return True, "Camoufox package installed and browser fetched successfully."
+            from engine.browser_downloader import BrowserDownloader
+            ok, dl_msg = await asyncio.to_thread(BrowserDownloader.download_camoufox)
+            return ok, dl_msg
         except Exception as e:
             logger.error(f"[SandboxInstaller] Camoufox check error: {e}")
             return False, str(e)

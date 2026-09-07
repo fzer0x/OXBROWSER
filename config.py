@@ -394,17 +394,22 @@ AI_CUSTOM_EXCLUSIONS: list = ["/do\\s*not/i", "/reject/i", "/ablehnen/i", "/opt-
 DEFAULT_ENABLE_HONEYPOT_SHIELD: bool = True
 
 CONFIG_FILE = os.path.join(BASE_DIR, "app_config.json")
+VAULT_FILE = os.path.join(BASE_DIR, "app_config.vault")
 
 def load_app_config():
     """
     Loads persistent application settings from the encrypted vault (app_config.vault)
     via SecretsManager. Falls back gracefully if vault is unavailable.
     """
-    global GEMINI_API_KEY, GEMINI_DEFAULT_MODEL, AI_PROVIDER_STRATEGY, API_HOST, API_PORT, API_BEARER_TOKEN
+    global SECRET_KEY, GEMINI_API_KEY, GEMINI_DEFAULT_MODEL, AI_PROVIDER_STRATEGY, API_HOST, API_PORT, API_BEARER_TOKEN
     global AI_CONSENT_STRATEGY, AI_TEMPERATURE, AI_SHADOW_DOM_DEPTH, AI_CUSTOM_EXCLUSIONS, DEFAULT_ENABLE_HONEYPOT_SHIELD
     try:
         from storage.secrets_manager import SecretsManager
         SecretsManager.initialize()
+
+        val = SecretsManager.get("secret_key", "")
+        if val:
+            SECRET_KEY = str(val).strip()
 
         val = SecretsManager.get("gemini_api_key", "")
         if val:
@@ -484,6 +489,8 @@ def save_app_config():
         from storage.secrets_manager import SecretsManager
         if not SecretsManager.is_initialized():
             SecretsManager.initialize()
+        if SECRET_KEY:
+            SecretsManager.set("secret_key", SECRET_KEY)
         SecretsManager.set("gemini_api_key", GEMINI_API_KEY)
         SecretsManager.set("gemini_default_model", GEMINI_DEFAULT_MODEL)
         SecretsManager.set("ai_provider_strategy", AI_PROVIDER_STRATEGY)

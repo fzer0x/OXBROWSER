@@ -800,7 +800,9 @@ class BrowserLauncher:
                 except ImportError:
                     pass
 
-                if not has_camoufox_lib:
+                from engine.browser_downloader import BrowserDownloader
+                is_cf_ready, _ = BrowserDownloader.is_engine_installed("camoufox")
+                if not is_cf_ready or not has_camoufox_lib or not camoufox_bin:
                     from engine.sandbox.sandbox_installer import SandboxInstaller
                     ok, msg = await SandboxInstaller.ensure_camoufox_installed()
                     if ok:
