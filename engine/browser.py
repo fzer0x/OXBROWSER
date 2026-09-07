@@ -384,13 +384,20 @@ class BrowserLauncher:
                 logger.warning(f"[BrowserLauncher] Pre-launch proxy check timed out or failed: {p_err}. Using existing telemetry fallback.")
 
         # Determine Target Timezone ID
-        if is_manual_tz:
+        auto_tz_enabled = bool(proxy_cfg.get("auto_timezone", profile.get("auto_timezone", True)))
+        p_tz = str(proxy_info.get("timezone") or "").strip()
+
+        if proxy_cfg.get("enabled") and proxy_cfg.get("host") and auto_tz_enabled and p_tz:
+            # When proxy is enabled and auto_timezone is active (default), align directly to proxy IP timezone!
+            tz_id = p_tz
+            if profile.get("timezone") != p_tz:
+                profile["timezone"] = p_tz
+                self.profile_manager.save_profile(profile)
+        elif is_manual_tz:
             # 1. User explicitly configured a specific timezone in the profile - HIGHEST PRIORITY
             tz_id = prof_tz
-        elif proxy_cfg.get("enabled") and proxy_cfg.get("host") and proxy_cfg.get("auto_timezone", True):
-            # 2. Auto mode with active proxy: resolve via ProxyChecker
-            p_tz = str(proxy_info.get("timezone") or "").strip()
-            tz_id = p_tz if p_tz else sys_tz
+        elif proxy_cfg.get("enabled") and proxy_cfg.get("host") and p_tz:
+            tz_id = p_tz
         else:
             # 3. Auto mode without proxy or default: use host machine's system timezone
             tz_id = sys_tz
@@ -870,11 +877,27 @@ class BrowserLauncher:
                             "media.autoplay.allow-muted",
                             "media.autoplay.blocking_policy",
                             "intl.accept_languages",
-                            "intl.locale.requested"
+                            "intl.locale.requested",
+                            "roverfox.s.timezone"
                         ]
                         filtered_ujs = [l for l in existing_lines if not any(k in l for k in managed_keys)]
                         filtered_ujs.append(f'user_pref("intl.accept_languages", {json.dumps(clean_lang_str)});\n')
                         filtered_ujs.append(f'user_pref("intl.locale.requested", {json.dumps(primary_lang)});\n')
+                        filtered_ujs.append(f'user_pref("roverfox.s.timezone_0", {json.dumps(tz_id)});\n')
+                        filtered_ujs.append(f'user_pref("roverfox.s.timezone_1", {json.dumps(tz_id)});\n')
+
+                        # Sanitize any stale roverfox timezone preference in existing prefs.js
+                        prefs_js_path = os.path.join(user_data_dir, "prefs.js")
+                        if os.path.exists(prefs_js_path):
+                            try:
+                                with open(prefs_js_path, "r", encoding="utf-8") as f_p:
+                                    p_lines = f_p.readlines()
+                                clean_p_lines = [l for l in p_lines if not l.strip().startswith('user_pref("roverfox.s.timezone_')]
+                                clean_p_lines.append(f'user_pref("roverfox.s.timezone_0", {json.dumps(tz_id)});\n')
+                                with open(prefs_js_path, "w", encoding="utf-8") as f_p:
+                                    f_p.writelines(clean_p_lines)
+                            except Exception as e_p:
+                                logger.debug(f"Could not sanitize prefs.js timezone: {e_p}")
                         if custom_ua_enabled and ua:
                             filtered_ujs.append(f'user_pref("general.useragent.override", {json.dumps(ua)});\n')
                         filtered_ujs.append(f'user_pref("browser.startup.page", {3 if effective_restore else 0});\n')
@@ -945,6 +968,8 @@ class BrowserLauncher:
                     camou_config["locale:region"] = primary_lang.split("-")[1] if "-" in primary_lang else ""
                     ff_prefs["intl.accept_languages"] = clean_lang_str
                     ff_prefs["intl.locale.requested"] = primary_lang
+                    ff_prefs["roverfox.s.timezone_0"] = tz_id
+                    ff_prefs["roverfox.s.timezone_1"] = tz_id
                     child_env["LANG"] = f"{primary_lang.replace('-', '_')}.UTF-8"
 
                     # 5. OS & Platform Alignment
@@ -1215,8 +1240,10 @@ class BrowserLauncher:
                             pass
                     await self._inject_cookies_for_profile(profile_id, context)
                     
-                    # In-Browser Login Assistant HUD (Camoufox has native C++ stealth, seeds, timezone & canvas)
+                    # In-Browser Login Assistant HUD & Native Timezone Assertion
                     try:
+                        if hasattr(context, "add_init_script"):
+                            await context.add_init_script(f'try {{ if (typeof window.setTimezone === "function") window.setTimezone({json.dumps(tz_id)}); }} catch(e) {{}}')
                         accs = profile.get("accounts", [])
                         if accs:
                             from engine.account_manager import AccountManager
@@ -1233,6 +1260,7 @@ class BrowserLauncher:
                         try:
                             await p_start.set_viewport_size({"width": win_w, "height": win_h})
                             await p_start.evaluate(f"window.moveTo({win_x}, {win_y}); window.resizeTo({win_w}, {win_h});")
+                            await p_start.evaluate(f"if (typeof window.setTimezone === 'function') window.setTimezone({json.dumps(tz_id)});");
                         except Exception:
                             pass
                         if navigate_start_url and start_url:

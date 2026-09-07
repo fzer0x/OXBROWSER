@@ -338,6 +338,34 @@ class FingerprintGenerator:
                     return origGetTimezoneOffset.apply(this, arguments);
                 }}
             }}, 'getTimezoneOffset');
+
+            const origToString = Date.prototype.toString;
+            Date.prototype.toString = makeNative(function toString() {{
+                try {{
+                    const d = this;
+                    if (isNaN(d.getTime())) return origToString.apply(d, arguments);
+                    const formatter = new Intl.DateTimeFormat('en-US', {{
+                        weekday: 'short', month: 'short', day: '2-digit', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit', second: '2-digit',
+                        hourCycle: 'h23', timeZone: targetTz
+                    }});
+                    const p = {{}};
+                    formatter.formatToParts(d).forEach(x => {{ p[x.type] = x.value; }});
+                    const offsetFormatter = new Intl.DateTimeFormat('en-US', {{
+                        timeZone: targetTz, timeZoneName: 'longOffset'
+                    }});
+                    const offsetPart = offsetFormatter.formatToParts(d).find(x => x.type === 'timeZoneName');
+                    const offsetStr = (offsetPart ? offsetPart.value : 'GMT').replace(':', '');
+                    const nameFormatter = new Intl.DateTimeFormat('en-US', {{
+                        timeZone: targetTz, timeZoneName: 'long'
+                    }});
+                    const namePart = nameFormatter.formatToParts(d).find(x => x.type === 'timeZoneName');
+                    const tzName = namePart ? namePart.value : targetTz;
+                    return p.weekday + ' ' + p.month + ' ' + p.day + ' ' + p.year + ' ' + p.hour + ':' + p.minute + ':' + p.second + ' ' + offsetStr + ' (' + tzName + ')';
+                }} catch (e) {{
+                    return origToString.apply(this, arguments);
+                }}
+            }}, 'toString');
         }} catch(e) {{ console.debug('Intl patch error:', e); }}
         """
 

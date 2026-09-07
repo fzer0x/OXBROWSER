@@ -9,8 +9,8 @@
       "accent_color": "#f59e0b",
       "is_builtin": false,
       "is_active": false,
-      "created_at": 1788501300.8470564,
-      "updated_at": 1788501300.9025116,
+      "created_at": 1788779283.5517569,
+      "updated_at": 1788779283.6071966,
       "roles": {
         "text_model": "qwen2.5:3b",
         "reasoning_model": "deepseek-r1:1.5b",
@@ -83,5 +83,5 @@
     }
   },
   "version": "2.0.0",
-  "updated_at": 1788501308.4479485
+  "updated_at": 1788779287.9080818
 }

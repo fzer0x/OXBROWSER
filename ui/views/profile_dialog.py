@@ -654,8 +654,7 @@ class ProfileDialog(QDialog):
             self.proxy_info_label.setText(f" Proxy Error: {err} ({latency} ms)")
 
     def _get_proxy_config_from_ui(self) -> dict:
-        tz_is_manual = hasattr(self, "tz_combo") and bool(self.tz_combo.currentData() and self.tz_combo.currentData() != "auto")
-        auto_tz_val = False if tz_is_manual else self.auto_tz_cb.isChecked()
+        auto_tz_val = self.auto_tz_cb.isChecked() if hasattr(self, "auto_tz_cb") else True
         cfg = {
             "enabled": self.proxy_enable_cb.isChecked(),
             "type": self.proxy_type_combo.currentText(),
@@ -3113,16 +3112,22 @@ class ProfileDialog(QDialog):
             "isolate_network": self.isolate_net_cb.isChecked()
         }
 
-        chosen_tz = self.tz_combo.currentData()
-        if not chosen_tz:
-            raw_text = self.tz_combo.currentText().strip()
-            if "(" in raw_text and ")" in raw_text:
-                for p in raw_text.split():
-                    if "/" in p:
-                        chosen_tz = p
-                        break
+        auto_tz_val = self.auto_tz_cb.isChecked() if hasattr(self, "auto_tz_cb") else True
+        d["auto_timezone"] = auto_tz_val
+        p_info = getattr(self, "proxy_info", {}) or {}
+        if auto_tz_val and getattr(self, "proxy_enable_cb", None) and self.proxy_enable_cb.isChecked() and p_info.get("timezone"):
+            chosen_tz = p_info.get("timezone")
+        else:
+            chosen_tz = self.tz_combo.currentData()
             if not chosen_tz:
-                chosen_tz = raw_text or "auto"
+                raw_text = self.tz_combo.currentText().strip()
+                if "(" in raw_text and ")" in raw_text:
+                    for p in raw_text.split():
+                        if "/" in p:
+                            chosen_tz = p
+                            break
+                if not chosen_tz:
+                    chosen_tz = raw_text or "auto"
         d["timezone"] = chosen_tz
         d["language"] = self.lang_input.text().strip() or "en-US,en;q=0.9"
         d["do_not_track"] = self.dnt_combo.currentData() or "null"
