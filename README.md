@@ -5,7 +5,7 @@
 [![Engines](https://img.shields.io/badge/Browser_Engines-Camoufox%20%7C%20Playwright%20%7C%20Nodriver-orange.svg)](https://github.com/fzer0x/OX_REL)
 [![Security](https://img.shields.io/badge/Crypto-Argon2id%20%2B%20AES--256--GCM-red.svg)](https://cryptography.io/)
 [![License MIT](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey.svg)](https://github.com/fzer0x/OX_REL)
+[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows-blue.svg)](https://github.com/fzer0x/OX_REL)
 
 > **OXBROWSER** is an enterprise-grade, multi-engine anti-detect browser, fingerprint randomization platform, and autonomous AI swarm automation suite. Engineered for high-stealth web data extraction, multi-account orchestration, automated bot-defense evasion, and visual DAG workflow execution.
 
@@ -51,8 +51,11 @@
   - [10. REST API, SSE & WebSocket Automation](#10-rest-api-sse--websocket-automation)
 - [Directory Structure](#directory-structure)
 - [Installation & Setup](#installation--setup)
-  - [Prerequisites](#prerequisites)
+  - [Prerequisites & Supported Platforms](#prerequisites--supported-platforms)
   - [Quick Start](#quick-start)
+  - [🐧 Linux Setup & Execution](#-linux-setup--execution)
+  - [🪟 Windows Execution & Smart App Control](#-windows-execution--smart-app-control)
+  - [📦 Building Windows Executable & Portable Package](#-building-windows-executable--portable-package)
 - [Configuration & Environment](#configuration--environment)
 - [REST API Reference](#rest-api-reference)
 - [Testing & Quality Assurance](#testing--quality-assurance)
@@ -246,12 +249,13 @@ Automate complex browser flows using the interactive PyQt6 workflow canvas or ex
 
 ## Installation & Setup
 
-### Prerequisites
-- **Python**: `3.12+`
-- **Operating System**: Linux (Ubuntu 22.04+, Debian 12+, Arch, Fedora), Windows 10/11, or macOS (Apple Silicon / Intel).
+### Prerequisites & Supported Platforms
+- **Supported Operating Systems**: **Linux** (Ubuntu 20.04/22.04/24.04+, Debian 11/12+, Arch Linux, Fedora, RHEL) and **Windows** (Windows 10, Windows 11 64-bit).
+- **Python**: `3.12+` (64-bit)
 - **Optional Dependencies**:
   - `ollama`: For running local LLMs and VLMs (Qwen 2.5, DeepSeek R1, LLaVA).
-  - `docker` / `podman`: For container-isolated sandboxing.
+  - `docker` / `podman`: For container-isolated sandboxing (Linux).
+  - `qemu` / `kvm`: For hardware MicroVM isolation (Linux).
 
 ### Quick Start
 
@@ -263,8 +267,13 @@ Automate complex browser flows using the interactive PyQt6 workflow canvas or ex
 
 2. **Create and Activate a Virtual Environment**:
    ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scriptsctivate
+   python -m venv .venv
+   # On Linux:
+   source .venv/bin/activate
+   # On Windows (PowerShell):
+   .\.venv\Scripts\Activate.ps1
+   # On Windows (CMD):
+   call .venv\Scripts\activate.bat
    ```
 
 3. **Install Dependencies**:
@@ -282,24 +291,115 @@ Automate complex browser flows using the interactive PyQt6 workflow canvas or ex
    python main.py
    ```
 
-### 🪟 Building Windows Executable (.exe)
+### 🐧 Linux Setup & Execution
 
-You can build a standalone Windows `.exe` either automatically via GitHub Actions or locally on Windows:
+OXBROWSER is fully engineered for Linux and includes native support for Xvfb headless virtual displays, automated dependency resolution, and hardware isolation (KVM/QEMU, Podman, and VirtioFS).
 
-#### Option A: Automated via GitHub Actions (Cloud Native)
+#### 1. System Package Requirements
+Install the required system libraries for PyQt6 and headless browser automation:
+
+- **Ubuntu / Debian**:
+  ```bash
+  sudo apt-get update && sudo apt-get install -y \
+    python3 python3-venv python3-pip \
+    libgl1-mesa-glx libegl1 libxkbcommon-x11-0 libdbus-1-3 libxcb-cursor0 \
+    xvfb
+  ```
+
+- **Arch Linux**:
+  ```bash
+  sudo pacman -S --needed python python-pip xorg-server-xvfb libxkbcommon
+  ```
+
+- **Fedora / RHEL**:
+  ```bash
+  sudo dnf install -y python3 python3-pip xorg-x11-server-Xvfb libxkbcommon-x11
+  ```
+
+#### 2. One-Click Linux Launcher (`run_linux.sh`)
+OXBROWSER includes an automated launcher script that configures `.venv`, verifies dependencies, and boots the application:
+```bash
+chmod +x run_linux.sh
+./run_linux.sh
+```
+
+#### 3. Headless Server / Daemon Mode
+For headless cloud VPS servers (without an attached physical display), run OXBROWSER with a virtual framebuffer (Xvfb) or start the backend automation daemon directly:
+```bash
+# Option A: Headless GUI with virtual display
+xvfb-run -a python3 main.py
+
+# Option B: Dedicated REST/WebSocket automation daemon
+python3 dev/soxbot_backend.py
+```
+
+#### 4. Hardware MicroVM & Container Sandboxing
+On Linux, OXBROWSER can isolate profiles inside lightweight microVMs (via Cloud-Hypervisor/Firecracker) or Podman containers:
+```bash
+# Enable KVM hardware virtualization for current user
+sudo usermod -aG kvm $USER
+```
+
+### 🪟 Windows Execution & Smart App Control
+
+On Windows 10 and Windows 11, OXBROWSER provides multiple startup methods designed to integrate seamlessly and avoid Windows security restrictions (such as **Smart App Control** / *Smart App-Steuerung*).
+
+#### 🚀 Recommended Daily Launch (100% Smart App Control Safe)
+
+Windows 11 **Smart App Control (SAC)** blocks newly compiled `.exe` files that lack a commercial code-signing certificate and cloud reputation. To run OXBROWSER natively without blocking or annoying console popups:
+
+| Launch Method | File | Description |
+| :--- | :--- | :--- |
+| **Desktop Shortcut** | `Desktop\OXBROWSER.lnk` | Double-click the app icon created on your Desktop. Runs silently with zero console popup. |
+| **Project Shortcut** | `OXBROWSER.lnk` | Native Windows shortcut with official icon located directly in the project root. |
+| **Silent VBScript** | `OXBROWSER.vbs` | Double-clickable silent runner that launches via signed `pythonw.exe` without terminal flashes. |
+| **Batch Launcher** | `run_oxbrowser.bat` | Standard batch script launcher for command-line users. |
+
+> **Why this works:** These launchers invoke `pythonw.exe` from your local environment, which is **digitally signed by the Python Software Foundation and trusted by Microsoft**. Smart App Control permits it unconditionally.
+
+To (re-)create the Desktop and project root shortcuts at any time:
+```powershell
+powershell -ExecutionPolicy Bypass -File .\create_shortcuts.ps1
+```
+
+---
+
+### 📦 Building Windows Executable & Portable Package
+
+#### 1. Portable Standalone Distribution (`build_portable_package.bat`) — *Recommended*
+Creates a fully self-contained, portable folder in `dist/OXBROWSER_PORTABLE/` that runs on **any** Windows 10/11 machine (including machines with Smart App Control enabled) without installation or code-signing certificates:
+1. Run `build_portable_package.bat` (double-click or execute in terminal):
+   ```cmd
+   build_portable_package.bat
+   ```
+2. The standalone folder is created at `dist\OXBROWSER_PORTABLE\`.
+3. Zip this folder and distribute it to any Windows machine. Users can launch it directly via `OXBROWSER.vbs` or create a desktop shortcut using `Verknuepfung_auf_Desktop_erstellen.bat`.
+
+#### 2. PyInstaller Single Folder Build (`build_windows.bat`)
+Compiles a traditional PyInstaller bundle:
+1. Run the builder script:
+   - In **PowerShell**:
+     ```powershell
+     .\build_windows.bat
+     ```
+   - In **Command Prompt (CMD)**:
+     ```cmd
+     build_windows.bat
+     ```
+   - Or double-click `build_windows.bat` in Windows Explorer.
+2. The binary bundle is placed in `dist/OXBROWSER/OXBROWSER.exe`.
+3. **If Windows 11 Smart App Control blocks `OXBROWSER.exe`:**
+   - **Option A (Instant)**: Use `OXBROWSER.lnk` or `OXBROWSER.vbs` instead.
+   - **Option B (Turn off SAC)**: Press `Win + R`, enter `windowsdefender://appbrowser`, open *Smart App Control settings*, and set to **Off** (standard developer recommendation by Microsoft).
+   - **Option C (Code Signing)**: Sign the binary with a trusted commercial certificate using `signtool sign /fd SHA256 /tr http://timestamp.digicert.com dist\OXBROWSER\OXBROWSER.exe`.
+
+#### 3. Automated via GitHub Actions (Cloud Native)
 1. Push your commit or release tag (e.g. `v1.0.0`) to GitHub:
    ```bash
    git push origin main
    ```
 2. Go to **Actions** -> **Build Windows Executable (.exe)** in your GitHub repository.
-3. Download the compiled `OXBROWSER-Windows-x64.zip` containing `OXBROWSER.exe`.
-
-#### Option B: Local Build on Windows
-1. Double-click `build_windows.bat` (or execute it in Command Prompt / PowerShell):
-   ```cmd
-   build_windows.bat
-   ```
-2. The standalone executable is placed in `dist/OXBROWSER/OXBROWSER.exe`.
+3. Download the compiled `OXBROWSER-Windows-x64.zip` containing the build artifacts.
 
 ---
 
