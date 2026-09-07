@@ -1,7 +1,11 @@
 import os
+import sys
 
 # Base Directories
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if getattr(sys, "frozen", False):
+    BASE_DIR = os.path.dirname(os.path.abspath(sys.executable))
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROFILES_DIR = os.path.join(BASE_DIR, "profiles")
 EXTENSIONS_DIR = os.path.join(BASE_DIR, "extensions")
 SESSIONS_DIR = os.path.join(BASE_DIR, "sessions")

@@ -282,6 +282,25 @@ Automate complex browser flows using the interactive PyQt6 workflow canvas or ex
    python main.py
    ```
 
+### 🪟 Building Windows Executable (.exe)
+
+You can build a standalone Windows `.exe` either automatically via GitHub Actions or locally on Windows:
+
+#### Option A: Automated via GitHub Actions (Cloud Native)
+1. Push your commit or release tag (e.g. `v1.0.0`) to GitHub:
+   ```bash
+   git push origin main
+   ```
+2. Go to **Actions** -> **Build Windows Executable (.exe)** in your GitHub repository.
+3. Download the compiled `OXBROWSER-Windows-x64.zip` containing `OXBROWSER.exe`.
+
+#### Option B: Local Build on Windows
+1. Double-click `build_windows.bat` (or execute it in Command Prompt / PowerShell):
+   ```cmd
+   build_windows.bat
+   ```
+2. The standalone executable is placed in `dist/OXBROWSER/OXBROWSER.exe`.
+
 ---
 
 ## Configuration & Environment

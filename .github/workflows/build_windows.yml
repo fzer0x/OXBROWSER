@@ -1,0 +1,62 @@
+name: Build Windows Executable (.exe)
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build Executable with PyInstaller
+        run: |
+          pyinstaller --clean -y oxbrowser.spec
+
+      - name: Verify Executable Creation
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "dist\OXBROWSER\OXBROWSER.exe")) {
+            Write-Error "OXBROWSER.exe was not created in dist\OXBROWSER\!"
+            exit 1
+          }
+          Write-Host "OXBROWSER.exe verified successfully."
+
+      - name: Package Windows Artifact
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "dist\OXBROWSER\*" -DestinationPath "OXBROWSER-Windows-x64.zip"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: OXBROWSER-Windows-x64
+          path: OXBROWSER-Windows-x64.zip
+          retention-days: 14
+
+      - name: Release on Tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: OXBROWSER-Windows-x64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
