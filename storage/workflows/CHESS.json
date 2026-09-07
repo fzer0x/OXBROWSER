@@ -1,0 +1,171 @@
+{
+  "id": "cdece0b6-14fb-4691-994a-117ffb2fbe65",
+  "name": "Template Campaign 5",
+  "description": "Automated No-Code Farming & Stealth Routine",
+  "category": "E-Commerce / Social",
+  "entry_node_id": "n3",
+  "created_at": 1787784046.7808747,
+  "updated_at": 1788073108.5152504,
+  "variables": {},
+  "nodes": {
+    "n1": {
+      "id": "n1",
+      "node_type": "start",
+      "title": "Initialize Chess Session",
+      "params": {},
+      "position": {
+        "x": -347.0,
+        "y": 5.0
+      },
+      "is_breakpoint": false
+    },
+    "n2": {
+      "id": "n2",
+      "node_type": "navigate",
+      "title": "Open Chess Table",
+      "params": {
+        "url": "https://chess.com/",
+        "param1": "https://chess.com/"
+      },
+      "position": {
+        "x": 100.89945652173911,
+        "y": -0.583420190589635
+      },
+      "is_breakpoint": false
+    },
+    "n3": {
+      "id": "n3",
+      "node_type": "loop",
+      "title": "Play Loop (40 Turns)",
+      "params": {
+        "iterations": 400,
+        "num_val": 400.0
+      },
+      "position": {
+        "x": 493.80737186974636,
+        "y": 11.91810680929403
+      },
+      "is_breakpoint": false
+    },
+    "n4": {
+      "id": "n4",
+      "node_type": "chess_solver",
+      "title": "Stockfish Auto-Move",
+      "params": {
+        "platform": "chess_com",
+        "engine_type": "super_grandmaster_godmode",
+        "depth": 12,
+        "auto_move": true,
+        "ai_model": "deepseek-r1:1.5b",
+        "model_name": "deepseek-r1:1.5b",
+        "num_val": 12.0,
+        "stop_on_error": true,
+        "target_elo": "1500",
+        "param1": "1500",
+        "difficulty_depth": 6
+      },
+      "position": {
+        "x": 777.7497709873968,
+        "y": -168.0760922743129
+      },
+      "is_breakpoint": false
+    },
+    "n5": {
+      "id": "n5",
+      "node_type": "wait",
+      "title": "Opponent Turn Dwell",
+      "params": {
+        "duration": 3.0,
+        "num_val": 3.0,
+        "stop_on_error": false
+      },
+      "position": {
+        "x": 789.1622774825188,
+        "y": 150.91009152275277
+      },
+      "is_breakpoint": false
+    },
+    "n6": {
+      "id": "n6",
+      "node_type": "terminate",
+      "title": "Finish Match",
+      "params": {
+        "status": "success"
+      },
+      "position": {
+        "x": 1010.9681996086107,
+        "y": 1.505381604696673
+      },
+      "is_breakpoint": false
+    },
+    "n_135777": {
+      "id": "n_135777",
+      "node_type": "wait",
+      "title": "Wait",
+      "params": {},
+      "position": {
+        "x": -122.63424657534244,
+        "y": 2.8191780821917805
+      },
+      "is_breakpoint": false
+    }
+  },
+  "edges": [
+    {
+      "id": "11a4fe75-f300-4e00-a108-cec6a48a5371",
+      "source_node_id": "n3",
+      "source_port": "loop_body",
+      "target_node_id": "n4",
+      "target_port": "in"
+    },
+    {
+      "id": "fb8b1431-8638-4123-b920-3f07e6fc52f2",
+      "source_node_id": "n4",
+      "source_port": "out",
+      "target_node_id": "n5",
+      "target_port": "in"
+    },
+    {
+      "id": "f68fbe01-f673-49ae-8844-d23a8f8f189f",
+      "source_node_id": "n5",
+      "source_port": "out",
+      "target_node_id": "n3",
+      "target_port": "in"
+    },
+    {
+      "id": "17cca7cf-f0f7-49b5-8461-dc5baa800b69",
+      "source_node_id": "n4",
+      "source_port": "checkmate",
+      "target_node_id": "n6",
+      "target_port": "in"
+    },
+    {
+      "id": "095dcdef-574f-40c9-9025-bbeb447770e7",
+      "source_node_id": "n3",
+      "source_port": "loop_exit",
+      "target_node_id": "n6",
+      "target_port": "in"
+    },
+    {
+      "id": "f1b30afa-c9dc-42d0-864b-f7c5c9214a91",
+      "source_node_id": "n1",
+      "source_port": "out",
+      "target_node_id": "n_135777",
+      "target_port": "in"
+    },
+    {
+      "id": "8057a77f-fa8c-46ac-b576-22416b9d60cf",
+      "source_node_id": "n_135777",
+      "source_port": "out",
+      "target_node_id": "n2",
+      "target_port": "in"
+    },
+    {
+      "id": "dada3263-a63e-4952-bea7-76613663feee",
+      "source_node_id": "n2",
+      "source_port": "out",
+      "target_node_id": "n3",
+      "target_port": "in"
+    }
+  ]
+}

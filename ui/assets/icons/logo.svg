@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e2638"/>
+      <stop offset="50%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#0a0f1d"/>
+    </linearGradient>
+    
+    <!-- Neon Border Gradient -->
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="40%" stop-color="#3b82f6"/>
+      <stop offset="80%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+
+    <!-- Shield Gradient -->
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe"/>
+      <stop offset="50%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+
+    <!-- 0x Monogram Gradients -->
+    <linearGradient id="cyanCore" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+
+    <linearGradient id="violetCore" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Base Plate / Squircle -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#bgGrad)" stroke="#222f46" stroke-width="1.5"/>
+  <rect x="3.5" y="3.5" width="57" height="57" rx="14.5" fill="none" stroke="url(#borderGrad)" stroke-width="1.2" stroke-opacity="0.4"/>
+
+  <!-- Stealth Cyber Shield Structure -->
+  <path d="M32 11 L50 18.5 C50 33 42.5 45 32 52.5 C21.5 45 14 33 14 18.5 Z" 
+        fill="#0b1120" 
+        fill-opacity="0.9"
+        stroke="url(#shieldGrad)" 
+        stroke-width="2.6" 
+        stroke-linejoin="round"/>
+
+  <!-- Shield Inner Accent Arch -->
+  <path d="M32 16 L44 21.5 C44 32.5 38.5 41 32 46.5 C25.5 41 20 32.5 20 21.5 Z" 
+        fill="none" 
+        stroke="url(#borderGrad)" 
+        stroke-width="1" 
+        stroke-opacity="0.3"/>
+
+  <!-- "0" - Stylized Cyber Capsule -->
+  <rect x="22" y="22" width="9" height="18" rx="4.5" 
+        fill="none" 
+        stroke="url(#cyanCore)" 
+        stroke-width="3" 
+        stroke-linecap="round"/>
+  
+  <!-- "0" Inner Glow Slit -->
+  <line x1="24.5" y1="33" x2="28.5" y2="29" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-opacity="0.95"/>
+
+  <!-- "x" - Dynamic Intersecting Blades -->
+  <line x1="34" y1="23" x2="43" y2="39" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round"/>
+  <line x1="43" y1="23" x2="34" y2="39" stroke="url(#violetCore)" stroke-width="3.2" stroke-linecap="round"/>
+
+  <!-- Glowing Nodes & Micro-accents -->
+  <circle cx="32" cy="11" r="2.2" fill="#38bdf8"/>
+  <circle cx="32" cy="52.5" r="1.8" fill="#8b5cf6"/>
+  <circle cx="22" cy="22" r="1" fill="#ffffff"/>
+  <circle cx="43" cy="23" r="1" fill="#38bdf8"/>
+</svg>

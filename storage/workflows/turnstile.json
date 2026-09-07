@@ -1,0 +1,92 @@
+{
+  "id": "e9649667-c8f2-4fc7-b959-2dfd120cc88e",
+  "name": "Template Campaign 3",
+  "description": "Automated No-Code Farming & Stealth Routine",
+  "category": "E-Commerce / Social",
+  "entry_node_id": "n1",
+  "created_at": 1787777823.8661404,
+  "updated_at": 1787778532.6827283,
+  "variables": {},
+  "nodes": {
+    "n1": {
+      "id": "n1",
+      "node_type": "navigate",
+      "title": "Target Protected Site",
+      "params": {
+        "url": "https://2captcha.com/demo/cloudflare-turnstile-challenge",
+        "param1": "https://2captcha.com/demo/cloudflare-turnstile-challenge"
+      },
+      "position": {
+        "x": -150.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n2": {
+      "id": "n2",
+      "node_type": "solve_captcha",
+      "title": "AI Auto-Solve Turnstile",
+      "params": {
+        "vision_model": "llava:7b",
+        "param2": "llava:7b",
+        "strategy": "audio_first",
+        "param1": "audio_first",
+        "whisper_model": "gemini-audio"
+      },
+      "position": {
+        "x": 120.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n3": {
+      "id": "n3",
+      "node_type": "wait",
+      "title": "Wait Verification Token",
+      "params": {
+        "duration": 3.0
+      },
+      "position": {
+        "x": 390.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n4": {
+      "id": "n4",
+      "node_type": "terminate",
+      "title": "Finish",
+      "params": {
+        "status": "success"
+      },
+      "position": {
+        "x": 660.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    }
+  },
+  "edges": [
+    {
+      "id": "2a9e5d27-eba3-499d-a915-3be5536f7c4c",
+      "source_node_id": "n1",
+      "source_port": "out",
+      "target_node_id": "n2",
+      "target_port": "in"
+    },
+    {
+      "id": "6b32a0ea-0bbf-47e4-bd75-7df7cd997417",
+      "source_node_id": "n2",
+      "source_port": "out",
+      "target_node_id": "n3",
+      "target_port": "in"
+    },
+    {
+      "id": "6b265fef-4678-437f-a34b-b270ce23d00d",
+      "source_node_id": "n3",
+      "source_port": "out",
+      "target_node_id": "n4",
+      "target_port": "in"
+    }
+  ]
+}

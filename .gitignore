@@ -1,0 +1,141 @@
+# ==============================================================================
+# .gitignore - OXBrowser AntiDetect
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. External Downloads: Browser Engines & WebDrivers
+# ------------------------------------------------------------------------------
+# Camoufox browser binaries & runtime (approx. 1.3+ GB)
+camoufox/
+camoufox-bin/
+
+# Chromium / Chrome / Edge / Brave portable binaries
+chrome-linux64/
+chrome-win64/
+chrome-mac/
+chromium/
+
+# Playwright & Selenium browser downloads
+ms-playwright/
+.playwright/
+pw-browsers/
+
+# WebDriver executables
+chromedriver*
+geckodriver*
+msedgedriver*
+
+# ------------------------------------------------------------------------------
+# 2. External Downloads: LLM & AI Models, Weights & Binaries
+# ------------------------------------------------------------------------------
+# Ollama models, blobs, manifests & host binaries (26+ GB)
+models/ollama_models/
+models/bin/
+models/engines/
+ollama_archive.tmp
+*.tar.zst
+
+# HuggingFace & Vision/Audio/OCR model downloads
+models/whisper/
+models/florence/
+models/got_ocr/
+models/sensevoice/
+models/florence-2-base.onnx
+models/mouse-trajectory-onnx.onnx
+
+# General AI/LLM model weights and checkpoint files
+*.bin
+*.safetensors
+*.gguf
+*.pt
+*.pth
+*.ckpt
+*.h5
+*.tflite
+
+# HuggingFace & Torch cache directories
+.cache/
+huggingface/
+.huggingface/
+torch/
+
+# ------------------------------------------------------------------------------
+# 3. Browser Runtime Data, Profiles, Sessions & Secrets
+# ------------------------------------------------------------------------------
+# Browser profiles (user data, caches, cookies, storage - 800+ MB)
+profiles/
+!profiles/.gitkeep
+
+# Active browser sessions & logs
+sessions/
+!sessions/.gitkeep
+
+# Sensitive config, environment files & encrypted vaults
+.env
+.env.*
+*.env
+*.env.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+app_config.vault
+app_config.json
+*.vault
+secrets.json
+secrets/
+*secret*
+*secrets*
+*.key
+*.pem
+*.crt
+*.cert
+*.p12
+*.pfx
+api_keys.json
+keys.json
+token.json
+credentials.json
+
+# Runtime databases & caches
+storage/*.sqlite
+storage/*.sqlite-shm
+storage/*.sqlite-wal
+storage/proxies.json
+storage/poker_memory.json
+storage/secrets.json
+
+# ------------------------------------------------------------------------------
+# 4. Python, Virtual Environments & Caches
+# ------------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Pytest & Testing Caches
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build & PyInstaller
+build/
+dist/
+*.spec
+
+# ------------------------------------------------------------------------------
+# 5. IDE & OS Artifacts
+# ------------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db

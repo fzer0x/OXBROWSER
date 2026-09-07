@@ -1,0 +1,163 @@
+{
+  "id": "784ea78e-04ab-4230-8783-de262c1f62e7",
+  "name": "testpen",
+  "description": "Automated No-Code Farming & Stealth Routine",
+  "category": "E-Commerce / Social",
+  "entry_node_id": "start_1",
+  "created_at": 1787740850.3996031,
+  "updated_at": 1787751897.7916253,
+  "variables": {},
+  "nodes": {
+    "start_1": {
+      "id": "start_1",
+      "node_type": "start",
+      "title": "Initialize Session",
+      "params": {},
+      "position": {
+        "x": -301.0,
+        "y": -74.0
+      },
+      "is_breakpoint": false
+    },
+    "n_4bb060": {
+      "id": "n_4bb060",
+      "node_type": "navigate",
+      "title": "Navigate",
+      "params": {
+        "url": "https://browserscan.net",
+        "param1": "https://browserscan.net"
+      },
+      "position": {
+        "x": -50.0,
+        "y": -76.0
+      },
+      "is_breakpoint": false
+    },
+    "n_bd8223": {
+      "id": "n_bd8223",
+      "node_type": "wait",
+      "title": "Wait",
+      "params": {
+        "duration": 15.0,
+        "num_val": 15.0
+      },
+      "position": {
+        "x": 199.0,
+        "y": -78.0
+      },
+      "is_breakpoint": false
+    },
+    "n_cad3ee": {
+      "id": "n_cad3ee",
+      "node_type": "fingerprint_morph",
+      "title": "Fingerprint Morph",
+      "params": {
+        "intensity": "aggressive",
+        "param1": "aggressive"
+      },
+      "position": {
+        "x": 437.0,
+        "y": -79.0
+      },
+      "is_breakpoint": false
+    },
+    "n_4b8cff": {
+      "id": "n_4b8cff",
+      "node_type": "clear_cache",
+      "title": "Clear Cache",
+      "params": {},
+      "position": {
+        "x": -315.0,
+        "y": 62.0
+      },
+      "is_breakpoint": false
+    },
+    "n_805aa6": {
+      "id": "n_805aa6",
+      "node_type": "rotate_proxy",
+      "title": "Rotate Proxy",
+      "params": {},
+      "position": {
+        "x": -57.0,
+        "y": 63.0
+      },
+      "is_breakpoint": false
+    },
+    "n_903b1e": {
+      "id": "n_903b1e",
+      "node_type": "refresh",
+      "title": "Refresh",
+      "params": {},
+      "position": {
+        "x": 196.0,
+        "y": 63.0
+      },
+      "is_breakpoint": false
+    },
+    "n_5a779c": {
+      "id": "n_5a779c",
+      "node_type": "wait",
+      "title": "Wait (Copy)",
+      "params": {
+        "duration": 15.0,
+        "num_val": 15.0
+      },
+      "position": {
+        "x": 433.0,
+        "y": 61.0
+      },
+      "is_breakpoint": false
+    }
+  },
+  "edges": [
+    {
+      "id": "e1ea1d1b-08a3-4cbd-8040-f4faf0d6ce2c",
+      "source_node_id": "start_1",
+      "source_port": "out",
+      "target_node_id": "n_4bb060",
+      "target_port": "in"
+    },
+    {
+      "id": "3a4e7a6d-cfbf-4996-8fe8-6179d9a1b5df",
+      "source_node_id": "n_4bb060",
+      "source_port": "out",
+      "target_node_id": "n_bd8223",
+      "target_port": "in"
+    },
+    {
+      "id": "39479d99-6731-4649-8223-4606448eea32",
+      "source_node_id": "n_bd8223",
+      "source_port": "out",
+      "target_node_id": "n_cad3ee",
+      "target_port": "in"
+    },
+    {
+      "id": "51ae3d4b-ec1c-40c6-93d6-27815e5da3fb",
+      "source_node_id": "n_cad3ee",
+      "source_port": "out",
+      "target_node_id": "n_4b8cff",
+      "target_port": "in"
+    },
+    {
+      "id": "236e4f7d-7640-4820-bc24-1234fde8c50c",
+      "source_node_id": "n_4b8cff",
+      "source_port": "out",
+      "target_node_id": "n_805aa6",
+      "target_port": "in"
+    },
+    {
+      "id": "03c52474-ff30-4168-b12c-2506f666e681",
+      "source_node_id": "n_805aa6",
+      "source_port": "out",
+      "target_node_id": "n_903b1e",
+      "target_port": "in"
+    },
+    {
+      "id": "ce37f93c-2f2d-4122-8be7-df51a93caa6e",
+      "source_node_id": "n_903b1e",
+      "source_port": "out",
+      "target_node_id": "n_5a779c",
+      "target_port": "in"
+    }
+  ]
+}

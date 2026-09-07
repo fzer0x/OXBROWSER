@@ -1,0 +1,129 @@
+{
+  "id": "81c93ca2-c1b2-440b-907e-9c7e0ae4ebe8",
+  "name": "Template Campaign 1",
+  "description": "Automated No-Code Farming & Stealth Routine",
+  "category": "E-Commerce / Social",
+  "entry_node_id": "n1",
+  "created_at": 1787734196.61839,
+  "updated_at": 1787734215.5795918,
+  "variables": {},
+  "nodes": {
+    "n1": {
+      "id": "n1",
+      "node_type": "start",
+      "title": "Initialize Session",
+      "params": {},
+      "position": {
+        "x": -390.0,
+        "y": -75.0
+      },
+      "is_breakpoint": false
+    },
+    "n2": {
+      "id": "n2",
+      "node_type": "navigate",
+      "title": "Open Google Search",
+      "params": {
+        "url": "https://www.google.com"
+      },
+      "position": {
+        "x": -130.0,
+        "y": -75.0
+      },
+      "is_breakpoint": false
+    },
+    "n3": {
+      "id": "n3",
+      "node_type": "vla_type",
+      "title": "Type GPU Query",
+      "params": {
+        "text": "RTX 4090 GPU",
+        "instruction": "Google search bar",
+        "press_enter": true,
+        "clear_first": true
+      },
+      "position": {
+        "x": 130.0,
+        "y": -75.0
+      },
+      "is_breakpoint": false
+    },
+    "n4": {
+      "id": "n4",
+      "node_type": "wait",
+      "title": "Wait for Results",
+      "params": {
+        "duration": 2.5
+      },
+      "position": {
+        "x": 390.0,
+        "y": -75.0
+      },
+      "is_breakpoint": false
+    },
+    "n5": {
+      "id": "n5",
+      "node_type": "scroll",
+      "title": "Scroll Results",
+      "params": {
+        "direction": "down",
+        "pixels": 500
+      },
+      "position": {
+        "x": -390.0,
+        "y": 75.0
+      },
+      "is_breakpoint": false
+    },
+    "n6": {
+      "id": "n6",
+      "node_type": "terminate",
+      "title": "Finish Farming",
+      "params": {
+        "status": "success"
+      },
+      "position": {
+        "x": -130.0,
+        "y": 75.0
+      },
+      "is_breakpoint": false
+    }
+  },
+  "edges": [
+    {
+      "id": "24270600-091b-49e7-88d0-438d1464379c",
+      "source_node_id": "n1",
+      "source_port": "out",
+      "target_node_id": "n2",
+      "target_port": "in"
+    },
+    {
+      "id": "830c0786-5a3e-4fc2-bb14-03931c73a253",
+      "source_node_id": "n2",
+      "source_port": "out",
+      "target_node_id": "n3",
+      "target_port": "in"
+    },
+    {
+      "id": "d79e91ec-3f47-4219-8773-097343921027",
+      "source_node_id": "n3",
+      "source_port": "out",
+      "target_node_id": "n4",
+      "target_port": "in"
+    },
+    {
+      "id": "3c2aa176-6e4e-4110-bd1e-915b4298f5aa",
+      "source_node_id": "n4",
+      "source_port": "out",
+      "target_node_id": "n5",
+      "target_port": "in"
+    },
+    {
+      "id": "6544dc91-6fa6-4cb7-8295-d2179c68e3d1",
+      "source_node_id": "n5",
+      "source_port": "out",
+      "target_node_id": "n6",
+      "target_port": "in"
+    }
+  ]
+}

@@ -1,0 +1,179 @@
+{
+  "id": "06b2480d-c9eb-42b0-82ad-4333088b56b4",
+  "name": "Template Campaign 1",
+  "description": "Automated No-Code Farming & Stealth Routine",
+  "category": "E-Commerce / Social",
+  "entry_node_id": "n1",
+  "created_at": 1787723904.0886228,
+  "updated_at": 1787740638.0681186,
+  "variables": {},
+  "nodes": {
+    "n1": {
+      "id": "n1",
+      "node_type": "start",
+      "title": "Initialize Session",
+      "params": {
+        "param1": "",
+        "param2": "",
+        "stop_on_error": true
+      },
+      "position": {
+        "x": -390.0,
+        "y": -75.0
+      },
+      "is_breakpoint": false
+    },
+    "n2": {
+      "id": "n2",
+      "node_type": "navigate",
+      "title": "Go to Google",
+      "params": {
+        "url": "https://www.google.com",
+        "wait_until": "load",
+        "timeout_ms": 5000.0,
+        "stop_on_error": true
+      },
+      "position": {
+        "x": -130.0,
+        "y": -75.0
+      },
+      "is_breakpoint": false
+    },
+    "n_12a2cc": {
+      "id": "n_12a2cc",
+      "node_type": "vla_type",
+      "title": "Vla Type",
+      "params": {
+        "instruction": "Click search button",
+        "text": "xposed-framework",
+        "stop_on_error": false,
+        "param1": "stelle fragen \u00fcber samsung s24 rooting",
+        "use_ai_generation": true,
+        "ai_prompt": "stelle fragen \u00fcber samsung s24 rooting",
+        "ai_model": "auto"
+      },
+      "position": {
+        "x": 390.0,
+        "y": -75.0
+      },
+      "is_breakpoint": false
+    },
+    "n_92b846": {
+      "id": "n_92b846",
+      "node_type": "solve_captcha",
+      "title": "Solve Captcha",
+      "params": {
+        "vision_model": "llava:7b",
+        "strategy": "audio_first",
+        "whisper_model": "large-v3-turbo",
+        "param2": "llava:7b"
+      },
+      "position": {
+        "x": -130.0,
+        "y": 75.0
+      },
+      "is_breakpoint": false
+    },
+    "n_ebe62e": {
+      "id": "n_ebe62e",
+      "node_type": "wait",
+      "title": "Wait",
+      "params": {},
+      "position": {
+        "x": 130.0,
+        "y": 75.0
+      },
+      "is_breakpoint": false
+    },
+    "n_992f1d": {
+      "id": "n_992f1d",
+      "node_type": "adversarial_audit",
+      "title": "Adversarial Audit",
+      "params": {
+        "audit_mode": "full",
+        "param1": "full"
+      },
+      "position": {
+        "x": -390.0,
+        "y": 75.0
+      },
+      "is_breakpoint": false
+    },
+    "n_b35604": {
+      "id": "n_b35604",
+      "node_type": "adversarial_audit",
+      "title": "Adversarial Audit (Copy)",
+      "params": {
+        "audit_mode": "full",
+        "param1": "full"
+      },
+      "position": {
+        "x": 130.0,
+        "y": -75.0
+      },
+      "is_breakpoint": false
+    },
+    "n_3e40f2": {
+      "id": "n_3e40f2",
+      "node_type": "ai_model_task",
+      "title": "Ai Model Task",
+      "params": {},
+      "position": {
+        "x": 389.0,
+        "y": 71.0
+      },
+      "is_breakpoint": false
+    }
+  },
+  "edges": [
+    {
+      "id": "e1",
+      "source_node_id": "n1",
+      "source_port": "out",
+      "target_node_id": "n2",
+      "target_port": "in"
+    },
+    {
+      "id": "829297b3-0457-465d-a089-a7aea9e1f2b5",
+      "source_node_id": "n_92b846",
+      "source_port": "out",
+      "target_node_id": "n_ebe62e",
+      "target_port": "in"
+    },
+    {
+      "id": "7dd64b9d-1d2d-4cd0-9935-87fd32a17e48",
+      "source_node_id": "n_12a2cc",
+      "source_port": "out",
+      "target_node_id": "n_992f1d",
+      "target_port": "in"
+    },
+    {
+      "id": "878e4dd4-f078-47ba-b099-2594369cefe3",
+      "source_node_id": "n_992f1d",
+      "source_port": "out",
+      "target_node_id": "n_92b846",
+      "target_port": "in"
+    },
+    {
+      "id": "5e4104a7-d2ae-41c2-bd5a-e9e59b5ad639",
+      "source_node_id": "n2",
+      "source_port": "out",
+      "target_node_id": "n_b35604",
+      "target_port": "in"
+    },
+    {
+      "id": "50bdc7fb-cb7a-4e03-bb0c-d26163449268",
+      "source_node_id": "n_b35604",
+      "source_port": "out",
+      "target_node_id": "n_12a2cc",
+      "target_port": "in"
+    },
+    {
+      "id": "a6fa07f5-58f1-4f1f-824a-1ab332ab55ca",
+      "source_node_id": "n_ebe62e",
+      "source_port": "out",
+      "target_node_id": "n_3e40f2",
+      "target_port": "in"
+    }
+  ]
+}

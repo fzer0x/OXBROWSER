@@ -1,0 +1,129 @@
+{
+  "id": "aae58df1-cc33-46b1-81d3-24ebecc9ed1a",
+  "name": "Template Campaign 3",
+  "description": "Automated No-Code Farming & Stealth Routine",
+  "category": "E-Commerce / Social",
+  "entry_node_id": "n1",
+  "created_at": 1788415860.3267324,
+  "updated_at": 1788416721.0495727,
+  "variables": {},
+  "nodes": {
+    "n1": {
+      "id": "n1",
+      "node_type": "navigate",
+      "title": "Target Protected Site",
+      "params": {
+        "url": "https://2captcha.com/demo/recaptcha-v3",
+        "param1": "https://2captcha.com/demo/recaptcha-v3"
+      },
+      "position": {
+        "x": -150.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n2": {
+      "id": "n2",
+      "node_type": "solve_captcha",
+      "title": "AI Auto-Solve Turnstile",
+      "params": {},
+      "position": {
+        "x": 120.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n3": {
+      "id": "n3",
+      "node_type": "wait",
+      "title": "Wait Verification Token",
+      "params": {
+        "duration": 3.0
+      },
+      "position": {
+        "x": 390.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n4": {
+      "id": "n4",
+      "node_type": "terminate",
+      "title": "Finish",
+      "params": {
+        "status": "success"
+      },
+      "position": {
+        "x": 660.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n_0bf602": {
+      "id": "n_0bf602",
+      "node_type": "wait",
+      "title": "Wait",
+      "params": {
+        "duration": 3.0,
+        "num_val": 3.0
+      },
+      "position": {
+        "x": -8.349184782608745,
+        "y": -146.93478260869566
+      },
+      "is_breakpoint": false
+    },
+    "n_ba63b8": {
+      "id": "n_ba63b8",
+      "node_type": "vla_click",
+      "title": "Vla Click",
+      "params": {
+        "instruction": "/html/body/div[1]/div[2]/main/div/div/div[1]/section/div/form/div[2]/button",
+        "param1": "xpath",
+        "click_mode": "xpath"
+      },
+      "position": {
+        "x": 261.65081521739125,
+        "y": -146.93478260869566
+      },
+      "is_breakpoint": false
+    }
+  },
+  "edges": [
+    {
+      "id": "63fd03d8-26d2-4591-9825-c33ac93fda71",
+      "source_node_id": "n2",
+      "source_port": "out",
+      "target_node_id": "n3",
+      "target_port": "in"
+    },
+    {
+      "id": "5a51dbee-8e0f-45c9-9854-b5a6b043f4a4",
+      "source_node_id": "n3",
+      "source_port": "out",
+      "target_node_id": "n4",
+      "target_port": "in"
+    },
+    {
+      "id": "3bcbe205-c9c8-4fcb-a7db-272aca93edc5",
+      "source_node_id": "n1",
+      "source_port": "out",
+      "target_node_id": "n_0bf602",
+      "target_port": "in"
+    },
+    {
+      "id": "8c65da81-54ea-4a39-81d1-7e41db138427",
+      "source_node_id": "n_ba63b8",
+      "source_port": "out",
+      "target_node_id": "n3",
+      "target_port": "in"
+    },
+    {
+      "id": "91370c93-7786-44a0-97aa-d4284d9d1509",
+      "source_node_id": "n_0bf602",
+      "source_port": "out",
+      "target_node_id": "n2",
+      "target_port": "in"
+    }
+  ]
+}

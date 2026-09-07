@@ -1,0 +1,166 @@
+{
+  "id": "9d63ab2c-c67d-43f4-9d61-bba6657282cd",
+  "name": "Template Campaign 6",
+  "description": "Automated No-Code Farming & Stealth Routine",
+  "category": "E-Commerce / Social",
+  "entry_node_id": "n3",
+  "created_at": 1787789039.9350028,
+  "updated_at": 1787819920.1246948,
+  "variables": {},
+  "nodes": {
+    "n1": {
+      "id": "n1",
+      "node_type": "start",
+      "title": "Initialize Poker Session",
+      "params": {},
+      "position": {
+        "x": -359.0,
+        "y": 2.0
+      },
+      "is_breakpoint": false
+    },
+    "n2": {
+      "id": "n2",
+      "node_type": "navigate",
+      "title": "Open Poker Client",
+      "params": {
+        "url": "https://www.playwsop.com/play",
+        "wait_until": "load",
+        "timeout_ms": 9.0,
+        "num_val": 9.0,
+        "param1": "https://www.playwsop.com/play"
+      },
+      "position": {
+        "x": -61.988747553816054,
+        "y": -12.138454011741683
+      },
+      "is_breakpoint": false
+    },
+    "n3": {
+      "id": "n3",
+      "node_type": "loop",
+      "title": "Hand Loop (50x)",
+      "params": {
+        "iterations": 60,
+        "num_val": 60.0
+      },
+      "position": {
+        "x": 342.5171232876712,
+        "y": -3.51761252446184
+      },
+      "is_breakpoint": false
+    },
+    "n4": {
+      "id": "n4",
+      "node_type": "poker_solver",
+      "title": "GTO Equity Decision",
+      "params": {
+        "strategy": "loose_aggressive",
+        "num_opponents": 3,
+        "iterations": 3000,
+        "auto_click_action": true,
+        "ai_model": "hybrid_high_perf",
+        "model_name": "hybrid_high_perf",
+        "num_val": 3.0,
+        "param1": "loose_aggressive"
+      },
+      "position": {
+        "x": 616.0704500978475,
+        "y": -60.00000000000001
+      },
+      "is_breakpoint": false
+    },
+    "n5": {
+      "id": "n5",
+      "node_type": "wait",
+      "title": "Street Dwell Delay",
+      "params": {
+        "duration": 1.0,
+        "num_val": 1.0
+      },
+      "position": {
+        "x": 610.0,
+        "y": 80.0
+      },
+      "is_breakpoint": false
+    },
+    "n6": {
+      "id": "n6",
+      "node_type": "terminate",
+      "title": "Session Complete",
+      "params": {
+        "status": "success"
+      },
+      "position": {
+        "x": 880.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n_645782": {
+      "id": "n_645782",
+      "node_type": "wait",
+      "title": "Wait (Copy)",
+      "params": {
+        "duration": 30.0,
+        "num_val": 30.0
+      },
+      "position": {
+        "x": 152.0719178082192,
+        "y": -134.93150684931504
+      },
+      "is_breakpoint": false
+    }
+  },
+  "edges": [
+    {
+      "id": "e6717583-fb1f-496a-bbcd-0c1364a7ef54",
+      "source_node_id": "n3",
+      "source_port": "loop_body",
+      "target_node_id": "n4",
+      "target_port": "in"
+    },
+    {
+      "id": "4969356b-0a69-4689-82b9-b1cdb6481a2b",
+      "source_node_id": "n4",
+      "source_port": "out",
+      "target_node_id": "n5",
+      "target_port": "in"
+    },
+    {
+      "id": "76fe353b-2f14-4954-9b55-52859cfabc0f",
+      "source_node_id": "n5",
+      "source_port": "out",
+      "target_node_id": "n3",
+      "target_port": "in"
+    },
+    {
+      "id": "46c3c5cf-9209-4239-b726-c9806157507c",
+      "source_node_id": "n3",
+      "source_port": "loop_exit",
+      "target_node_id": "n6",
+      "target_port": "in"
+    },
+    {
+      "id": "0c18e05e-d578-408e-b5c3-08facd36e286",
+      "source_node_id": "n2",
+      "source_port": "out",
+      "target_node_id": "n_645782",
+      "target_port": "in"
+    },
+    {
+      "id": "ae3ad9fa-105d-4e27-9526-3049b0870918",
+      "source_node_id": "n_645782",
+      "source_port": "out",
+      "target_node_id": "n3",
+      "target_port": "in"
+    },
+    {
+      "id": "6260ad05-5e12-478f-92e2-b9afa27e537b",
+      "source_node_id": "n1",
+      "source_port": "out",
+      "target_node_id": "n2",
+      "target_port": "in"
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "id": "393bb7dc-33f6-4c36-8399-026c8b91e772",
+  "name": "ReCaptcha v2.1",
+  "description": "Automated No-Code Farming & Stealth Routine",
+  "category": "E-Commerce / Social",
+  "entry_node_id": "start_1",
+  "created_at": 1787737412.453486,
+  "updated_at": 1787779605.9823647,
+  "variables": {},
+  "nodes": {
+    "start_1": {
+      "id": "start_1",
+      "node_type": "start",
+      "title": "Initialize Session",
+      "params": {},
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n_dc7092": {
+      "id": "n_dc7092",
+      "node_type": "navigate",
+      "title": "Navigate",
+      "params": {
+        "url": "https://2captcha.com/de/demo/cloudflare-turnstile-challenge",
+        "param1": "https://2captcha.com/de/demo/cloudflare-turnstile-challenge"
+      },
+      "position": {
+        "x": 228.0,
+        "y": -1.0
+      },
+      "is_breakpoint": false
+    },
+    "n_20dd3d": {
+      "id": "n_20dd3d",
+      "node_type": "wait",
+      "title": "Wait",
+      "params": {
+        "duration": 7.0,
+        "num_val": 7.0
+      },
+      "position": {
+        "x": 86.0,
+        "y": 181.0
+      },
+      "is_breakpoint": false
+    },
+    "n_b74fb6": {
+      "id": "n_b74fb6",
+      "node_type": "solve_captcha",
+      "title": "Solve Captcha",
+      "params": {
+        "vision_model": "gemini-3.6-flash",
+        "param2": "gemini-3.6-flash",
+        "whisper_model": "base",
+        "strategy": "vision_only",
+        "param1": "vision_only"
+      },
+      "position": {
+        "x": 579.9378210014863,
+        "y": 254.55607198133475
+      },
+      "is_breakpoint": false
+    },
+    "n_8645c0": {
+      "id": "n_8645c0",
+      "node_type": "vla_click",
+      "title": "Vla Click",
+      "params": {
+        "click_mode": "selector",
+        "param1": "button._actionsItem_151cx_41:nth-child(1)",
+        "instruction": "button._actionsItem_151cx_41:nth-child(1)"
+      },
+      "position": {
+        "x": 549.0868704135769,
+        "y": -7.8955666181555415
+      },
+      "is_breakpoint": false
+    },
+    "n_ecb65a": {
+      "id": "n_ecb65a",
+      "node_type": "wait",
+      "title": "Wait",
+      "params": {
+        "duration": 4.0,
+        "num_val": 4.0
+      },
+      "position": {
+        "x": 433.73371256747294,
+        "y": 118.44594508227652
+      },
+      "is_breakpoint": false
+    }
+  },
+  "edges": [
+    {
+      "id": "daafeb97-5922-4d03-afe6-a08245f6d965",
+      "source_node_id": "start_1",
+      "source_port": "out",
+      "target_node_id": "n_dc7092",
+      "target_port": "in"
+    },
+    {
+      "id": "12568f6d-017b-4c1a-bbe3-719841af328c",
+      "source_node_id": "n_dc7092",
+      "source_port": "out",
+      "target_node_id": "n_20dd3d",
+      "target_port": "in"
+    },
+    {
+      "id": "2b857099-b4b6-4741-ad99-ec261b1bc085",
+      "source_node_id": "n_20dd3d",
+      "source_port": "out",
+      "target_node_id": "n_b74fb6",
+      "target_port": "in"
+    },
+    {
+      "id": "97aaf1bb-96dd-43ec-9744-54cd3f567955",
+      "source_node_id": "n_b74fb6",
+      "source_port": "out",
+      "target_node_id": "n_ecb65a",
+      "target_port": "in"
+    },
+    {
+      "id": "e6d38dc5-3f9e-47e5-958f-abc39a3f4c56",
+      "source_node_id": "n_ecb65a",
+      "source_port": "out",
+      "target_node_id": "n_8645c0",
+      "target_port": "in"
+    }
+  ]
+}

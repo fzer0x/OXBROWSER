@@ -1,0 +1,174 @@
+{
+  "id": "a457276b-f1a2-4416-904b-cad102ce3638",
+  "name": "Template Campaign 1",
+  "description": "Automated No-Code Farming & Stealth Routine",
+  "category": "E-Commerce / Social",
+  "entry_node_id": "n1",
+  "created_at": 1788066190.3575406,
+  "updated_at": 1788067071.0237782,
+  "variables": {},
+  "nodes": {
+    "n1": {
+      "id": "n1",
+      "node_type": "start",
+      "title": "Initialize Session",
+      "params": {},
+      "position": {
+        "x": -300.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n2": {
+      "id": "n2",
+      "node_type": "navigate",
+      "title": "Open Google Search",
+      "params": {
+        "url": "https://www.google.com"
+      },
+      "position": {
+        "x": -20.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n3": {
+      "id": "n3",
+      "node_type": "vla_type",
+      "title": "Type GPU Query",
+      "params": {
+        "text": "RTX 4090 GPU",
+        "instruction": "Google search bar",
+        "press_enter": true,
+        "clear_first": true
+      },
+      "position": {
+        "x": 261.4712199312715,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n4": {
+      "id": "n4",
+      "node_type": "wait",
+      "title": "Wait for Results",
+      "params": {
+        "duration": 2.5
+      },
+      "position": {
+        "x": 540.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n5": {
+      "id": "n5",
+      "node_type": "scroll",
+      "title": "Scroll Results",
+      "params": {
+        "direction": "down",
+        "pixels": 500
+      },
+      "position": {
+        "x": 820.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n6": {
+      "id": "n6",
+      "node_type": "terminate",
+      "title": "Finish Farming",
+      "params": {
+        "status": "success"
+      },
+      "position": {
+        "x": 1100.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n_5083c4": {
+      "id": "n_5083c4",
+      "node_type": "solve_captcha",
+      "title": "Solve Captcha",
+      "params": {
+        "vision_model": "llava:7b",
+        "param2": "llava:7b",
+        "strategy": "audio_first",
+        "param1": "audio_first",
+        "whisper_model": "large-v3-turbo"
+      },
+      "position": {
+        "x": 511.81056701030946,
+        "y": -248.63616838487962
+      },
+      "is_breakpoint": false
+    },
+    "n_351ba9": {
+      "id": "n_351ba9",
+      "node_type": "wait",
+      "title": "Wait",
+      "params": {
+        "duration": 5.0,
+        "num_val": 5.0
+      },
+      "position": {
+        "x": 280.12457044673545,
+        "y": -247.16494845360822
+      },
+      "is_breakpoint": false
+    }
+  },
+  "edges": [
+    {
+      "id": "19441efd-40f1-4c1b-8a2e-14c1518a8cdb",
+      "source_node_id": "n1",
+      "source_port": "out",
+      "target_node_id": "n2",
+      "target_port": "in"
+    },
+    {
+      "id": "dc44b461-3449-4700-8015-8c1bbd9ec9f9",
+      "source_node_id": "n2",
+      "source_port": "out",
+      "target_node_id": "n3",
+      "target_port": "in"
+    },
+    {
+      "id": "e97fa817-9bff-4ab8-bcde-7bd2e576216f",
+      "source_node_id": "n4",
+      "source_port": "out",
+      "target_node_id": "n5",
+      "target_port": "in"
+    },
+    {
+      "id": "0e444120-4ddd-4bd6-a97f-1216afa6ee4f",
+      "source_node_id": "n5",
+      "source_port": "out",
+      "target_node_id": "n6",
+      "target_port": "in"
+    },
+    {
+      "id": "dda0dfa6-4c09-4ac8-8b50-8a4d2dac7e0c",
+      "source_node_id": "n_5083c4",
+      "source_port": "out",
+      "target_node_id": "n4",
+      "target_port": "in"
+    },
+    {
+      "id": "f94b522c-0473-4bc8-959c-4211c1fdb6b4",
+      "source_node_id": "n3",
+      "source_port": "out",
+      "target_node_id": "n_351ba9",
+      "target_port": "in"
+    },
+    {
+      "id": "9e4498f8-8e2c-4a65-82a1-830b097a1a5e",
+      "source_node_id": "n_351ba9",
+      "source_port": "out",
+      "target_node_id": "n_5083c4",
+      "target_port": "in"
+    }
+  ]
+}

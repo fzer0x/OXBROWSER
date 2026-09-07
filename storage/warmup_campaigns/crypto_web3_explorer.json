@@ -1,0 +1,46 @@
+{
+    "name": "Crypto & Web3 Explorer",
+    "description": "Organic researcher persona visiting cryptocurrency, DeFi tracking, blockchain analytics, and tech forums.",
+    "category": "tech",
+    "persona": "crypto_trader",
+    "mode": "standard",
+    "ai_model": "qwen2.5:1.5b",
+    "motor_model": "min_jerk",
+    "typing_model": "bigram",
+    "content_aware_dwell": true,
+    "auto_evade_traps": true,
+    "enable_honeypot_shield": true,
+    "enable_captcha_solver": true,
+    "captcha_strategy": "audio_first",
+    "max_pages": 5,
+    "dwell_time": 8.0,
+    "click_depth": 1,
+    "concurrency": 1,
+    "enable_search": true,
+    "dismiss_banners": true,
+    "urls": [
+        "https://coinmarketcap.com",
+        "https://coingecko.com",
+        "https://defillama.com",
+        "https://etherscan.io",
+        "https://cointelegraph.com"
+    ],
+    "search_queries": [
+        "ethereum layer 2 rollup transaction fees",
+        "defi liquidity staking derivatives yield",
+        "bitcoin market trend analysis 2026",
+        "crypto news and regulatory updates"
+    ],
+    "custom_keywords": [
+        "crypto",
+        "bitcoin",
+        "ethereum",
+        "blockchain",
+        "market cap",
+        "defi",
+        "trading"
+    ],
+    "custom_websites": [],
+    "session_intent_topic": "Cryptocurrency Analytics and Web3 Research",
+    "headless": false
+}

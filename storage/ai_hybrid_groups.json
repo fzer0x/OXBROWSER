@@ -1,0 +1,87 @@
+{
+  "active_group_id": "custom_hybrid_77c3b356",
+  "groups": {
+    "test_custom_squad_001": {
+      "id": "test_custom_squad_001",
+      "name": "Updated Cyber Squad",
+      "description": "Testing custom hybrid group creation",
+      "icon": "🎯",
+      "accent_color": "#f59e0b",
+      "is_builtin": false,
+      "is_active": false,
+      "created_at": 1788501300.8470564,
+      "updated_at": 1788501300.9025116,
+      "roles": {
+        "text_model": "qwen2.5:3b",
+        "reasoning_model": "deepseek-r1:1.5b",
+        "coder_model": "granite3-dense:2b",
+        "vision_model": "got-ocr2",
+        "heavy_vision_model": "llava:7b",
+        "strategy_model": "qwen2.5:7b",
+        "micro_model": "qwen2.5:0.5b",
+        "audio_model": "sensevoice-small",
+        "sentinel_model": "onnx-anomaly",
+        "cloud_model": "gemini-3.6-flash"
+      },
+      "orchestration": {
+        "vram_strategy": "dynamic_tier",
+        "execution_mode": "cot_guided",
+        "temperature": 0.2,
+        "auto_fallback": true,
+        "system_directive": "Custom AI Swarm Team with dedicated role specializations."
+      },
+      "tasks": {}
+    },
+    "custom_hybrid_77c3b356": {
+      "id": "custom_hybrid_77c3b356",
+      "name": "♟️ Chess Grandmaster Hybrid Swarm",
+      "description": "Schach-Ensemble mit FEN-Vision-Extraktion, Stockfish-Berechnung und DeepSeek-R1 positionellem Meisterdenken.",
+      "icon": "🎯",
+      "accent_color": "#10b981",
+      "is_builtin": false,
+      "is_active": true,
+      "created_at": 1787791787.4366477,
+      "updated_at": 1787817192.5155628,
+      "roles": {
+        "text_model": "qwen2.5:1.5b",
+        "reasoning_model": "deepseek-r1:1.5b",
+        "coder_model": "qwen2.5-coder:1.5b",
+        "vision_model": "qwen2.5vl:3b",
+        "heavy_vision_model": "llava:7b",
+        "strategy_model": "deepseek-r1:1.5b",
+        "micro_model": "qwen2.5:0.5b",
+        "audio_model": "faster-whisper",
+        "sentinel_model": "onnx-anomaly",
+        "cloud_model": "gemini-3.7-flash"
+      },
+      "orchestration": {
+        "vram_strategy": "dynamic_tier",
+        "execution_mode": "cot_guided",
+        "temperature": 0.1,
+        "auto_fallback": true,
+        "system_directive": "Calculate absolute top engine moves and positional advantages."
+      },
+      "tasks": {
+        "poker": {
+          "vision_ocr_role": "vision_model",
+          "reasoning_role": "reasoning_model",
+          "strategy_role": "strategy_model",
+          "action_execution_role": "coder_model",
+          "sentinel_role": "sentinel_model",
+          "equity_eval_iterations": 3000,
+          "auto_bet_sizing": "gto_geometric",
+          "fold_equity_threshold": 0.2,
+          "custom_gto_prompt": "You are an elite Texas Hold'em Poker AI Grandmaster and Game Theory Optimal (GTO) Solver. Analyze live table cards, Monte Carlo equity, pot odds, opponent tendencies, and table position. Determine the highest Expected Value (EV) play ('fold', 'check', 'call', 'bet', 'raise', 'all_in') with optimal chip sizing.",
+          "custom_vision_prompt": "Analyze this live browser poker table screenshot. Extract: 1. Hero 2 hole cards. 2. Community board cards (flop/turn/river). 3. Total pot size and bet to call. 4. Active action buttons."
+        },
+        "chess": {
+          "vision_role": "vision_model",
+          "reasoning_role": "reasoning_model",
+          "depth": 18
+        }
+      }
+    }
+  },
+  "version": "2.0.0",
+  "updated_at": 1788501308.4479485
+}

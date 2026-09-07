@@ -1,0 +1,133 @@
+{
+  "id": "570e28df-823d-4ae6-b36f-742130b84396",
+  "name": "Template Campaign 2",
+  "description": "Automated No-Code Farming & Stealth Routine",
+  "category": "E-Commerce / Social",
+  "entry_node_id": "n1",
+  "created_at": 1787723904.0890617,
+  "updated_at": 1787723904.089062,
+  "variables": {},
+  "nodes": {
+    "n1": {
+      "id": "n1",
+      "node_type": "start",
+      "title": "Start Feed Routine",
+      "params": {},
+      "position": {
+        "x": -200,
+        "y": -100
+      },
+      "is_breakpoint": false
+    },
+    "n2": {
+      "id": "n2",
+      "node_type": "navigate",
+      "title": "Open Reddit",
+      "params": {
+        "url": "https://reddit.com/r/technology"
+      },
+      "position": {
+        "x": -200,
+        "y": 30
+      },
+      "is_breakpoint": false
+    },
+    "n3": {
+      "id": "n3",
+      "node_type": "loop",
+      "title": "Scroll Loop (5x)",
+      "params": {
+        "iterations": 5
+      },
+      "position": {
+        "x": 50,
+        "y": 30
+      },
+      "is_breakpoint": false
+    },
+    "n4": {
+      "id": "n4",
+      "node_type": "scroll",
+      "title": "Scroll Feed",
+      "params": {
+        "direction": "down",
+        "pixels": 500
+      },
+      "position": {
+        "x": 50,
+        "y": 170
+      },
+      "is_breakpoint": false
+    },
+    "n5": {
+      "id": "n5",
+      "node_type": "wait",
+      "title": "Read Post (Dwell)",
+      "params": {
+        "duration": 2.5
+      },
+      "position": {
+        "x": -150,
+        "y": 170
+      },
+      "is_breakpoint": false
+    },
+    "n6": {
+      "id": "n6",
+      "node_type": "terminate",
+      "title": "Finish Farming",
+      "params": {
+        "status": "success"
+      },
+      "position": {
+        "x": 300,
+        "y": 30
+      },
+      "is_breakpoint": false
+    }
+  },
+  "edges": [
+    {
+      "id": "64211046-2a97-433c-a841-01e9c974fb80",
+      "source_node_id": "n1",
+      "source_port": "out",
+      "target_node_id": "n2",
+      "target_port": "in"
+    },
+    {
+      "id": "a219d21b-9f85-4ee3-9ca0-e7bfc3e6cb87",
+      "source_node_id": "n2",
+      "source_port": "out",
+      "target_node_id": "n3",
+      "target_port": "in"
+    },
+    {
+      "id": "08da1113-8667-43b3-89c5-74ada0762b0f",
+      "source_node_id": "n3",
+      "source_port": "loop_body",
+      "target_node_id": "n4",
+      "target_port": "in"
+    },
+    {
+      "id": "60bba776-8702-4ec9-9c92-eff9008e57f4",
+      "source_node_id": "n4",
+      "source_port": "out",
+      "target_node_id": "n5",
+      "target_port": "in"
+    },
+    {
+      "id": "5975ef20-f562-48c0-8a52-756ba4fc68df",
+      "source_node_id": "n5",
+      "source_port": "out",
+      "target_node_id": "n3",
+      "target_port": "in"
+    },
+    {
+      "id": "e5b3cf80-4757-48fa-8322-0dfda7f249f0",
+      "source_node_id": "n3",
+      "source_port": "loop_exit",
+      "target_node_id": "n6",
+      "target_port": "in"
+    }
+  ]
+}

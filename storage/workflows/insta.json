@@ -1,0 +1,134 @@
+{
+  "id": "a5b0ba0a-03c6-4057-a704-5df89d9f16a2",
+  "name": "Template Campaign 2",
+  "description": "Automated No-Code Farming & Stealth Routine",
+  "category": "E-Commerce / Social",
+  "entry_node_id": "n1",
+  "created_at": 1787756738.4798682,
+  "updated_at": 1787777332.8863742,
+  "variables": {},
+  "nodes": {
+    "n1": {
+      "id": "n1",
+      "node_type": "start",
+      "title": "Start Feed Routine",
+      "params": {},
+      "position": {
+        "x": -200.0,
+        "y": -50.0
+      },
+      "is_breakpoint": false
+    },
+    "n2": {
+      "id": "n2",
+      "node_type": "navigate",
+      "title": "Open Reddit",
+      "params": {
+        "url": "https://tiktok.com",
+        "param1": "https://tiktok.com"
+      },
+      "position": {
+        "x": 60.0,
+        "y": -50.0
+      },
+      "is_breakpoint": false
+    },
+    "n3": {
+      "id": "n3",
+      "node_type": "loop",
+      "title": "Scroll Loop (5x)",
+      "params": {
+        "iterations": 5
+      },
+      "position": {
+        "x": 320.0,
+        "y": -50.0
+      },
+      "is_breakpoint": false
+    },
+    "n4": {
+      "id": "n4",
+      "node_type": "scroll",
+      "title": "Scroll Feed",
+      "params": {
+        "direction": "down",
+        "pixels": 500
+      },
+      "position": {
+        "x": 600.0,
+        "y": -120.0
+      },
+      "is_breakpoint": false
+    },
+    "n5": {
+      "id": "n5",
+      "node_type": "wait",
+      "title": "Read Post (Dwell)",
+      "params": {
+        "duration": 2.5
+      },
+      "position": {
+        "x": 600.0,
+        "y": 40.0
+      },
+      "is_breakpoint": false
+    },
+    "n6": {
+      "id": "n6",
+      "node_type": "terminate",
+      "title": "Finish",
+      "params": {
+        "status": "success"
+      },
+      "position": {
+        "x": 880.0,
+        "y": -50.0
+      },
+      "is_breakpoint": false
+    }
+  },
+  "edges": [
+    {
+      "id": "dcb77598-e641-45ed-b1e5-11cab6b6e65c",
+      "source_node_id": "n1",
+      "source_port": "out",
+      "target_node_id": "n2",
+      "target_port": "in"
+    },
+    {
+      "id": "c3f29f6b-eff4-4c3b-a6e0-26d8b7e18014",
+      "source_node_id": "n2",
+      "source_port": "out",
+      "target_node_id": "n3",
+      "target_port": "in"
+    },
+    {
+      "id": "652ac645-5530-47e7-a60d-4d5120ec9110",
+      "source_node_id": "n3",
+      "source_port": "loop_body",
+      "target_node_id": "n4",
+      "target_port": "in"
+    },
+    {
+      "id": "8131c5db-9087-4302-ac43-ab9d05d29177",
+      "source_node_id": "n4",
+      "source_port": "out",
+      "target_node_id": "n5",
+      "target_port": "in"
+    },
+    {
+      "id": "4a38d584-8ba9-414d-a30f-2df41c34cf22",
+      "source_node_id": "n5",
+      "source_port": "out",
+      "target_node_id": "n3",
+      "target_port": "in"
+    },
+    {
+      "id": "38407c6c-58b6-4729-b290-fd513be7293c",
+      "source_node_id": "n3",
+      "source_port": "loop_exit",
+      "target_node_id": "n6",
+      "target_port": "in"
+    }
+  ]
+}

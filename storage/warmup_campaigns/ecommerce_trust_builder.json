@@ -1,0 +1,46 @@
+{
+    "name": "E-Commerce Trust Builder",
+    "description": "High-reputation shopping & e-commerce browsing trajectory to establish legitimate consumer cookies and trust scores.",
+    "category": "ecommerce",
+    "persona": "shopper",
+    "mode": "standard",
+    "ai_model": "qwen2.5:1.5b",
+    "motor_model": "min_jerk",
+    "typing_model": "bigram",
+    "content_aware_dwell": true,
+    "auto_evade_traps": true,
+    "enable_honeypot_shield": true,
+    "enable_captcha_solver": true,
+    "captcha_strategy": "audio_first",
+    "max_pages": 6,
+    "dwell_time": 9.0,
+    "click_depth": 2,
+    "concurrency": 1,
+    "enable_search": true,
+    "dismiss_banners": true,
+    "urls": [
+        "https://www.amazon.com",
+        "https://www.ebay.com",
+        "https://www.walmart.com",
+        "https://www.target.com",
+        "https://www.bestbuy.com"
+    ],
+    "search_queries": [
+        "best noise cancelling headphones 2026",
+        "ergonomic mechanical keyboard review",
+        "summer sale deals electronics",
+        "top rated smart home gadgets"
+    ],
+    "custom_keywords": [
+        "shopping",
+        "deals",
+        "reviews",
+        "ratings",
+        "cart",
+        "products",
+        "discounts"
+    ],
+    "custom_websites": [],
+    "session_intent_topic": "Online Consumer Electronics & Tech Gadget Buying",
+    "headless": false
+}

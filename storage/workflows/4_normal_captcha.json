@@ -1,0 +1,111 @@
+{
+  "id": "e8913b4f-8012-4c6e-8219-09fca91c4992",
+  "name": "Template Campaign 4 - Normal Captcha",
+  "description": "Autonomous AI Solver for traditional Image-to-Text / Alphanumeric Normal Captchas",
+  "category": "Captcha / Automation",
+  "entry_node_id": "n1",
+  "created_at": 1788415700.0,
+  "updated_at": 1788415700.0,
+  "variables": {},
+  "nodes": {
+    "n1": {
+      "id": "n1",
+      "node_type": "navigate",
+      "title": "Target Normal Captcha Site",
+      "params": {
+        "url": "https://2captcha.com/demo/normal",
+        "param1": "https://2captcha.com/demo/normal"
+      },
+      "position": {
+        "x": -150.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n_wait1": {
+      "id": "n_wait1",
+      "node_type": "wait",
+      "title": "Wait Page Load",
+      "params": {
+        "duration": 2.5,
+        "num_val": 2.5
+      },
+      "position": {
+        "x": 100.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n2": {
+      "id": "n2",
+      "node_type": "solve_captcha",
+      "title": "AI Solve Normal Captcha",
+      "params": {
+        "captcha_type": "normal",
+        "strategy": "vision_first"
+      },
+      "position": {
+        "x": 350.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n3": {
+      "id": "n3",
+      "node_type": "wait",
+      "title": "Wait Verification",
+      "params": {
+        "duration": 3.0,
+        "num_val": 3.0
+      },
+      "position": {
+        "x": 600.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n4": {
+      "id": "n4",
+      "node_type": "terminate",
+      "title": "Finish",
+      "params": {
+        "status": "success"
+      },
+      "position": {
+        "x": 850.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    }
+  },
+  "edges": [
+    {
+      "id": "e1",
+      "source_node_id": "n1",
+      "source_port": "out",
+      "target_node_id": "n_wait1",
+      "target_port": "in"
+    },
+    {
+      "id": "e2",
+      "source_node_id": "n_wait1",
+      "source_port": "out",
+      "target_node_id": "n2",
+      "target_port": "in"
+    },
+    {
+      "id": "e3",
+      "source_node_id": "n2",
+      "source_port": "out",
+      "target_node_id": "n3",
+      "target_port": "in"
+    },
+    {
+      "id": "e4",
+      "source_node_id": "n3",
+      "source_port": "out",
+      "target_node_id": "n4",
+      "target_port": "in"
+    }
+  ]
+}

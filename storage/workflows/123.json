@@ -1,0 +1,24 @@
+{
+  "id": "2363c5ad-e0bd-49ac-aa85-d857657ad0f5",
+  "name": "123",
+  "description": "Automated No-Code Farming & Stealth Routine",
+  "category": "E-Commerce / Social",
+  "entry_node_id": "start_1",
+  "created_at": 1788410485.0633123,
+  "updated_at": 1788410485.063334,
+  "variables": {},
+  "nodes": {
+    "start_1": {
+      "id": "start_1",
+      "node_type": "start",
+      "title": "Initialize Session",
+      "params": {},
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    }
+  },
+  "edges": []
+}

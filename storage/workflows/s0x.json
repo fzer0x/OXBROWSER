@@ -1,0 +1,24 @@
+{
+  "id": "10f87920-bcac-4600-8637-abd9f4e23004",
+  "name": "S0X",
+  "description": "Automated No-Code Farming & Stealth Routine",
+  "category": "E-Commerce / Social",
+  "entry_node_id": "start_1",
+  "created_at": 1787778582.3372972,
+  "updated_at": 1787778582.3373272,
+  "variables": {},
+  "nodes": {
+    "start_1": {
+      "id": "start_1",
+      "node_type": "start",
+      "title": "Initialize Session",
+      "params": {},
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    }
+  },
+  "edges": []
+}

@@ -1,0 +1,107 @@
+{
+  "id": "c04cddd2-442c-4f38-a104-3ad043333763",
+  "name": "Template Campaign 3",
+  "description": "Automated No-Code Farming & Stealth Routine",
+  "category": "E-Commerce / Social",
+  "entry_node_id": "n1",
+  "created_at": 1788415605.9257293,
+  "updated_at": 1788415685.605753,
+  "variables": {},
+  "nodes": {
+    "n1": {
+      "id": "n1",
+      "node_type": "navigate",
+      "title": "Target Protected Site",
+      "params": {
+        "url": "https://2captcha.com/demo/cloudflare-turnstile",
+        "param1": "https://2captcha.com/demo/cloudflare-turnstile"
+      },
+      "position": {
+        "x": -150.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n2": {
+      "id": "n2",
+      "node_type": "solve_captcha",
+      "title": "AI Auto-Solve Turnstile",
+      "params": {},
+      "position": {
+        "x": 120.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n3": {
+      "id": "n3",
+      "node_type": "wait",
+      "title": "Wait Verification Token",
+      "params": {
+        "duration": 3.0
+      },
+      "position": {
+        "x": 390.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n4": {
+      "id": "n4",
+      "node_type": "terminate",
+      "title": "Finish",
+      "params": {
+        "status": "success"
+      },
+      "position": {
+        "x": 660.0,
+        "y": 0.0
+      },
+      "is_breakpoint": false
+    },
+    "n_a062a3": {
+      "id": "n_a062a3",
+      "node_type": "wait",
+      "title": "Wait",
+      "params": {
+        "duration": 5.0,
+        "num_val": 5.0
+      },
+      "position": {
+        "x": -11.0,
+        "y": -128.0
+      },
+      "is_breakpoint": false
+    }
+  },
+  "edges": [
+    {
+      "id": "7d7c7fd2-933e-414c-96f4-f77620a1c25c",
+      "source_node_id": "n2",
+      "source_port": "out",
+      "target_node_id": "n3",
+      "target_port": "in"
+    },
+    {
+      "id": "66752651-ade5-4ba6-8884-71da5854b0b5",
+      "source_node_id": "n3",
+      "source_port": "out",
+      "target_node_id": "n4",
+      "target_port": "in"
+    },
+    {
+      "id": "92756a34-6f9e-4908-9208-a058633c433c",
+      "source_node_id": "n1",
+      "source_port": "out",
+      "target_node_id": "n_a062a3",
+      "target_port": "in"
+    },
+    {
+      "id": "e3207f07-ea26-4e20-8610-93c48f7f4348",
+      "source_node_id": "n_a062a3",
+      "source_port": "out",
+      "target_node_id": "n2",
+      "target_port": "in"
+    }
+  ]
+}
