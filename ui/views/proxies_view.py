@@ -1,10 +1,10 @@
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem,
     QPushButton, QFileDialog, QInputDialog, QMessageBox, QHeaderView, QLabel,
-    QProgressBar
+    QProgressBar, QMenu, QApplication
 )
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtGui import QColor, QIcon
+from PyQt6.QtGui import QColor, QIcon, QAction
 from typing import Dict, Any, List, Optional
 import random
 import os
@@ -35,6 +35,7 @@ class ProxiesView(QWidget):
     """Proxy Pool Management Dashboard View with Speed Sorting and Configurable AI Google Camoufox Checker."""
 
     open_scraper_requested = pyqtSignal()
+    proxy_assigned = pyqtSignal()
 
     def __init__(
         self,
@@ -186,8 +187,10 @@ class ProxiesView(QWidget):
             header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
             header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
             header.setSectionResizeMode(7, QHeaderView.ResizeMode.Fixed)
-            self.table.setColumnWidth(7, 100)
+            self.table.setColumnWidth(7, 135)
 
+        self.table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.table.customContextMenuRequested.connect(self._show_context_menu)
         self.table.setSortingEnabled(True)
         layout.addWidget(self.table)
 
@@ -280,6 +283,16 @@ class ProxiesView(QWidget):
             ai_test_btn.clicked.connect(lambda _, proxy_item=p: self._test_single_proxy_google(proxy_item))
             actions_layout.addWidget(ai_test_btn)
 
+            # Assign to Profile Button
+            assign_btn = QPushButton("")
+            assign_btn.setIcon(self._get_icon("shield"))
+            assign_btn.setFixedSize(30, 28)
+            assign_btn.setProperty("class", "SecondaryButton")
+            assign_btn.setStyleSheet("border-radius: 5px; font-size: 11px;")
+            assign_btn.setToolTip("Connect / Assign this proxy to a Profile")
+            assign_btn.clicked.connect(lambda _, proxy_item=p: self._assign_proxy_to_profile(proxy_item))
+            actions_layout.addWidget(assign_btn)
+
             # Delete Button
             del_btn = QPushButton("")
             del_btn.setIcon(self._get_icon("trash-2"))
@@ -293,6 +306,95 @@ class ProxiesView(QWidget):
             self.table.setCellWidget(row, 7, actions_widget)
 
         self.table.setSortingEnabled(sorting_was_enabled)
+
+    def _assign_proxy_to_profile(self, proxy: dict):
+        profiles = self.profile_manager.list_profiles()
+        if not profiles:
+            QMessageBox.warning(self, "No Profiles", "No profiles found. Please create a profile first.")
+            return
+
+        profile_options = [f"{p.get('name', 'Unnamed')} (ID: {p.get('id', '')[:8]})" for p in profiles]
+        item, ok = QInputDialog.getItem(
+            self,
+            "Assign Proxy to Profile",
+            f"Select profile to connect with proxy {proxy.get('host')}:{proxy.get('port')}:",
+            profile_options,
+            0,
+            False
+        )
+        if ok and item:
+            idx = profile_options.index(item)
+            chosen_profile = profiles[idx]
+            pid = str(chosen_profile.get("id") or "").strip()
+            if not pid:
+                return
+
+            pdata = self.profile_manager.load_profile(pid)
+            if pdata:
+                proxy_cfg = {
+                    "enabled": True,
+                    "type": proxy.get("type", "http"),
+                    "host": proxy.get("host"),
+                    "port": int(proxy.get("port", 8080)),
+                    "username": proxy.get("username", ""),
+                    "password": proxy.get("password", ""),
+                    "auto_timezone": True,
+                    "auto_geolocation": True
+                }
+                if proxy.get("id"):
+                    proxy_cfg["proxy_id"] = proxy.get("id")
+
+                pdata["proxy"] = proxy_cfg
+                pdata["proxy_info"] = {
+                    "ip": proxy.get("ip") or proxy.get("host"),
+                    "country_code": proxy.get("country", ""),
+                    "country": proxy.get("country", ""),
+                    "city": proxy.get("city", ""),
+                    "timezone": proxy.get("timezone", "")
+                }
+                self.profile_manager.save_profile(pdata)
+                self.proxy_assigned.emit()
+                QMessageBox.information(
+                    self,
+                    "Proxy Assigned",
+                    f"Proxy {proxy.get('host')}:{proxy.get('port')} connected to profile '{pdata.get('name')}'.\nProfile list updated."
+                )
+
+    def _show_context_menu(self, pos):
+        item = self.table.itemAt(pos)
+        if not item:
+            return
+        row = item.row()
+        if row < 0 or row >= len(self.proxies):
+            return
+        proxy = self.proxies[row]
+
+        menu = QMenu(self)
+        assign_act = QAction(self._get_icon("shield"), "Assign to Profile...", self)
+        assign_act.triggered.connect(lambda: self._assign_proxy_to_profile(proxy))
+        menu.addAction(assign_act)
+
+        test_act = QAction(self._get_icon("cpu"), "Test with Google AI", self)
+        test_act.triggered.connect(lambda: self._test_single_proxy_google(proxy))
+        menu.addAction(test_act)
+
+        copy_act = QAction(self._get_icon("copy"), "Copy Host:Port", self)
+        copy_act.triggered.connect(lambda: self._copy_proxy_address(proxy))
+        menu.addAction(copy_act)
+
+        menu.addSeparator()
+        del_act = QAction(self._get_icon("trash-2"), "Delete Proxy", self)
+        del_act.triggered.connect(lambda: self._delete_single_proxy(proxy.get("id", "")))
+        menu.addAction(del_act)
+
+        viewport = self.table.viewport()
+        if viewport is not None:
+            menu.exec(viewport.mapToGlobal(pos))
+
+    def _copy_proxy_address(self, proxy: dict):
+        clipboard = QApplication.clipboard()
+        if clipboard is not None:
+            clipboard.setText(f"{proxy.get('host')}:{proxy.get('port')}")
 
     def _import_proxies_dialog(self):
         text, ok = QInputDialog.getMultiLineText(

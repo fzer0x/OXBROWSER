@@ -48,6 +48,12 @@ class ProxyManager:
             return sorted(self.proxies, key=sort_key)
         return self.proxies
 
+    def get_proxy(self, proxy_id: str) -> Optional[Dict]:
+        for p in self.proxies:
+            if p.get("id") == proxy_id:
+                return p
+        return None
+
     def add_proxy(self, proxy_data: Dict) -> Dict:
         if "id" not in proxy_data or not proxy_data["id"]:
             proxy_data["id"] = str(uuid.uuid4())

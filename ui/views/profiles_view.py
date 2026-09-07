@@ -187,7 +187,7 @@ class ProfilesView(QWidget):
         self.table.itemSelectionChanged.connect(self._on_table_selection_changed)
         layout.addWidget(self.table)
 
-    def reload_profiles(self):
+    def reload_profiles(self, force: bool = False):
         # Capture scroll position
         v_bar = self.table.verticalScrollBar()
         scroll_v = v_bar.value() if v_bar is not None else 0
@@ -195,7 +195,7 @@ class ProfilesView(QWidget):
         self.profiles = self.profile_manager.list_profiles()
         
         # Check if we can do a fast in-place update (same profile IDs in same order)
-        if self._can_update_in_place(self.profiles):
+        if not force and self._can_update_in_place(self.profiles):
             self._update_in_place(self.profiles)
         else:
             self._populate_table(self.profiles)
@@ -221,7 +221,7 @@ class ProfilesView(QWidget):
             pid = profile.get("id", "")
             is_running = profile.get("status") == "Running"
 
-            # Update Action Button if needed
+            # 1. Update Action Button if needed
             run_widget = self.table.cellWidget(r, 1)
             if run_widget:
                 btn = run_widget.findChild(QPushButton)
@@ -232,22 +232,91 @@ class ProfilesView(QWidget):
                         btn.setIcon(self._get_icon("square"))
                         btn.setProperty("class", "DangerButton")
                         btn.setStyleSheet("font-weight: 700; font-size: 11px; padding: 4px 12px; border-radius: 6px;")
-                        btn.clicked.disconnect()
+                        try:
+                            btn.clicked.disconnect()
+                        except Exception:
+                            pass
                         btn.clicked.connect(lambda _, p_id=pid: self._on_stop_profile(p_id))
                     elif not is_running and "STOP" in current_text:
                         btn.setText(" RUN")
                         btn.setIcon(self._get_icon("play"))
                         btn.setProperty("class", "SuccessButton")
                         btn.setStyleSheet("font-weight: 700; font-size: 11px; padding: 4px 12px; border-radius: 6px;")
-                        btn.clicked.disconnect()
+                        try:
+                            btn.clicked.disconnect()
+                        except Exception:
+                            pass
                         btn.clicked.connect(lambda _, p_id=pid: self._on_start_profile(p_id))
 
-            # Update Status Badge (Col 5)
+            # 2. Update Name (Col 2)
+            name_text = profile.get("name", "Unnamed")
+            name_item = self.table.item(r, 2)
+            if name_item:
+                if name_item.text() != name_text:
+                    name_item.setText(name_text)
+            else:
+                new_name_item = QTableWidgetItem(name_text)
+                new_name_item.setData(Qt.ItemDataRole.UserRole, pid)
+                self.table.setItem(r, 2, new_name_item)
+
+            # 3. Update Group, Tags & Trust Score (Col 4)
+            grp = profile.get("group", "Default")
+            tags = ", ".join(profile.get("tags", []))
+            tag_str = f" ({tags})" if tags else ""
+            t_score = profile.get("trust_score")
+            trust_str = f" | {t_score}%" if t_score is not None else ""
+            grp_text = f"{grp}{tag_str}{trust_str}"
+            grp_item = self.table.item(r, 4)
+            if grp_item:
+                if grp_item.text() != grp_text:
+                    grp_item.setText(grp_text)
+            else:
+                self.table.setItem(r, 4, QTableWidgetItem(grp_text))
+
+            # 4. Update Status Badge (Col 5)
             status_container = self.table.cellWidget(r, 5)
             if status_container:
                 badge = status_container.findChild(StatusBadge)
                 if badge and badge.text != profile.get("status", "Stopped"):
                     badge.set_status(profile.get("status", "Stopped"))
+
+            # 5. Update Proxy & IP (Col 6)
+            p = profile.get("proxy", {})
+            p_info = profile.get("proxy_info", {})
+            if p.get("enabled"):
+                ip_str = p_info.get("ip") or f"{p.get('host')}:{p.get('port')}"
+                country = p_info.get("country_code") or p_info.get("country") or ""
+                cntry_str = f" [{country}]" if country else ""
+                proxy_text = f"🟢 {p.get('type', 'HTTP').upper()}{cntry_str} {ip_str}"
+            else:
+                proxy_text = "⚪ Direct (No Proxy)"
+            
+            proxy_item = self.table.item(r, 6)
+            if proxy_item:
+                if proxy_item.text() != proxy_text:
+                    proxy_item.setText(proxy_text)
+            else:
+                self.table.setItem(r, 6, QTableWidgetItem(proxy_text))
+
+            # 6. Update Fingerprint OS & Engine (Col 7)
+            os_name = profile.get("os", "windows").capitalize()
+            res = profile.get("screen_resolution", "1920x1080")
+            eng_val = str(profile.get("engine", "camoufox")).lower()
+            if eng_val == "camoufox":
+                engine_str = "Camoufox"
+            elif eng_val == "nodriver":
+                engine_str = "Nodriver"
+            elif eng_val == "selenium_driverless":
+                engine_str = "Driverless"
+            else:
+                engine_str = "Playwright"
+            os_eng_text = f"{os_name} ({res}) | {engine_str}"
+            os_eng_item = self.table.item(r, 7)
+            if os_eng_item:
+                if os_eng_item.text() != os_eng_text:
+                    os_eng_item.setText(os_eng_text)
+            else:
+                self.table.setItem(r, 7, QTableWidgetItem(os_eng_text))
 
     def _populate_table(self, profiles_list: list):
         self.table.blockSignals(True)
@@ -564,7 +633,7 @@ class ProfilesView(QWidget):
     def _on_create_profile(self):
         dialog = ProfileDialog(self.profile_manager, launcher=self.launcher, proxy_manager=self.proxy_manager, parent=self)
         if dialog.exec() == ProfileDialog.DialogCode.Accepted:
-            self.reload_profiles()
+            self.reload_profiles(force=True)
 
     def _on_manage_accounts(self, profile_id: str):
         profile = self.profile_manager.load_profile(profile_id)
@@ -572,14 +641,14 @@ class ProfilesView(QWidget):
             dialog = ProfileDialog(self.profile_manager, profile_data=profile, launcher=self.launcher, proxy_manager=self.proxy_manager, parent=self)
             dialog.tabs.setCurrentIndex(6)  # Direct jump to Tab 7: Accounts & Logins
             if dialog.exec() == ProfileDialog.DialogCode.Accepted:
-                self.reload_profiles()
+                self.reload_profiles(force=True)
 
     def _on_edit_profile(self, profile_id: str):
         profile = self.profile_manager.load_profile(profile_id)
         if profile:
             dialog = ProfileDialog(self.profile_manager, profile_data=profile, launcher=self.launcher, proxy_manager=self.proxy_manager, parent=self)
             if dialog.exec() == ProfileDialog.DialogCode.Accepted:
-                self.reload_profiles()
+                self.reload_profiles(force=True)
 
     def _on_clone_profile(self, profile_id: str):
         cloned = self.profile_manager.clone_profile(profile_id)
@@ -735,9 +804,16 @@ class ProfilesView(QWidget):
                 pdata = self.profile_manager.load_profile(pid)
                 if pdata:
                     pdata["proxy"] = proxy_cfg
+                    pdata["proxy_info"] = {
+                        "ip": chosen_proxy.get("ip") or chosen_proxy.get("host"),
+                        "country_code": chosen_proxy.get("country", ""),
+                        "country": chosen_proxy.get("country", ""),
+                        "city": chosen_proxy.get("city", ""),
+                        "timezone": chosen_proxy.get("timezone", "")
+                    }
                     self.profile_manager.save_profile(pdata)
 
-            self.reload_profiles()
+            self.reload_profiles(force=True)
             QMessageBox.information(self, "Proxy Assigned", f"Assigned proxy to {len(selected_profile_ids)} selected profile(s).")
 
 

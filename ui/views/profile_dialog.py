@@ -3030,6 +3030,21 @@ class ProfileDialog(QDialog):
         d["notes"] = self.notes_input.toPlainText()
 
         d["proxy"] = self._get_proxy_config_from_ui()
+        if d["proxy"].get("enabled"):
+            p_cfg = d["proxy"]
+            p_info = dict(d.get("proxy_info") or {})
+            if getattr(self, "_selected_proxy_id", None) and hasattr(self.proxy_manager, "get_proxy"):
+                pool_p = self.proxy_manager.get_proxy(self._selected_proxy_id)
+                if pool_p:
+                    p_info.setdefault("ip", pool_p.get("ip") or pool_p.get("host"))
+                    p_info.setdefault("country_code", pool_p.get("country", ""))
+                    p_info.setdefault("country", pool_p.get("country", ""))
+                    p_info.setdefault("city", pool_p.get("city", ""))
+            if not p_info.get("ip"):
+                p_info["ip"] = p_cfg.get("host", "")
+            d["proxy_info"] = p_info
+        else:
+            d["proxy_info"] = {}
         d["network_killswitch"] = self.killswitch_cb.isChecked()
         d["tls_ja3_preset"] = self.tls_preset_combo.currentData() or "auto"
 

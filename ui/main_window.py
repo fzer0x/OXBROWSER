@@ -259,6 +259,7 @@ class MainWindow(QMainWindow):
         
         self.proxies_view = ProxiesView(self.proxy_manager, profile_manager=self.profile_manager)
         self.proxies_view.open_scraper_requested.connect(lambda: self.switch_view(2))
+        self.proxies_view.proxy_assigned.connect(lambda: self.profiles_view.reload_profiles(force=True))
 
         self.scraper_view = ProxyScraperView(self.proxy_manager)
         self.scraper_view.proxies_imported.connect(lambda: self.proxies_view.reload_proxies(sort_speed=True))
@@ -326,7 +327,9 @@ class MainWindow(QMainWindow):
             self.content_layout.setContentsMargins(16, 16, 16, 16)
             self.content_layout.setSpacing(14)
 
-        if index == 3:
+        if index == 0:
+            self.profiles_view.reload_profiles(force=True)
+        elif index == 3:
             self.ai_chat_view.reload_profiles()
         self.update_metrics()
 

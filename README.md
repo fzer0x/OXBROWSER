@@ -11,8 +11,33 @@
 
 ---
 
+## 📸 User Interface & Screenshots
+
+<div align="center">
+
+### 1. Profiles Manager & Stealth Fleet Dashboard
+![OXBROWSER Profiles Manager](Screenshot_01.png)
+*Centralized management for multi-engine anti-detect profiles, live proxy routing, accounts & auto-login, and real-time system telemetry.*
+
+<br/>
+
+### 2. Visual Node-Based Workflow Builder (DAG Automation)
+![OXBROWSER Visual Workflow Builder](Screenshot_02.png)
+*Interactive visual automation canvas with anti-detection nodes, dynamic AI decision branches, humanoid pacing, and live step-by-step debugging.*
+
+<br/>
+
+### 3. Multimodal AI Neural Operations Swarm Matrix
+![OXBROWSER AI Neural Operations Swarm Matrix](Screenshot_03.png)
+*Decentralized neural operations matrix orchestrating vision grounding (SmolVLM, Florence-2), local LLMs (DeepSeek R1, Qwen 2.5), and ONNX behavioral generators.*
+
+</div>
+
+---
+
 ## Table of Contents
 
+- [User Interface & Screenshots](#-user-interface--screenshots)
 - [Key Architecture & Core Features](#key-architecture--core-features)
   - [1. Multi-Engine Browser Core](#1-multi-engine-browser-core)
   - [2. Deep Fingerprint Synthesis & Anti-Detect Shield](#2-deep-fingerprint-synthesis--anti-detect-shield)
