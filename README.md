@@ -257,8 +257,8 @@ Automate complex browser flows using the interactive PyQt6 workflow canvas or ex
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/fzer0x/OX_REL.git
-   cd OX_REL
+   git clone https://github.com/fzer0x/OXBROWSER.git
+   cd OXBROWSER
    ```
 
 2. **Create and Activate a Virtual Environment**:
