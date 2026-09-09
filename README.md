@@ -60,6 +60,7 @@
 - [REST API Reference](#rest-api-reference)
 - [Testing & Quality Assurance](#testing--quality-assurance)
 - [Security & Ethical Use](#security--ethical-use)
+- [Acknowledgements & Credits](#acknowledgements--credits)
 - [License](#license)
 
 ---
@@ -479,6 +480,27 @@ pytest tests/test_dom_self_healing.py
 
 > [!CAUTION]
 > **OXBROWSER** is provided strictly for authorized security research, software quality assurance, web compatibility testing, and legitimate web automation. Users are responsible for complying with all applicable laws, regulations, and website terms of service. The developers assume no liability for misuse.
+
+---
+
+## Acknowledgements & Credits
+
+**OXBROWSER** builds upon and integrates remarkable open-source projects, tools, and research from the browser automation, security, and anti-detect communities. Special thanks and credit to:
+
+| Project / Library | Maintainer / Authors | Description & Role in OXBROWSER |
+| :--- | :--- | :--- |
+| [**Camoufox**](https://github.com/Daijro/camoufox) | [@Daijro](https://github.com/Daijro) | Native stealth anti-detect browser engine built on a customized Gecko (Firefox) C++ core with kernel-level spoofing (canvas, WebGL, audio, fonts, WebRTC, TLS ClientHello). |
+| [**Playwright**](https://github.com/microsoft/playwright) | [Microsoft](https://github.com/microsoft) | High-performance, cross-browser automation engine providing multi-context orchestration and reliable browser control. |
+| [**nodriver**](https://github.com/ultrafunkamsterdam/nodriver) | [@ultrafunkamsterdam](https://github.com/ultrafunkamsterdam) | Successor to undetected-chromedriver; native asynchronous Chrome DevTools Protocol automation without ChromeDriver binary signatures. |
+| [**selenium-driverless**](https://github.com/kaliiiiiiiiii/Selenium-Driverless) | [@kaliiiiiiiiii](https://github.com/kaliiiiiiiiii) | True undetected browser automation communicating directly with Chrome DevTools Protocol without driver binary footprints. |
+| [**curl-cffi**](https://github.com/yifeikong/curl-cffi) | [@yifeikong](https://github.com/yifeikong) | Python binding for `curl-impersonate`, enabling TLS/JA3/JA4 fingerprint impersonation and authentic HTTP/2 headers. |
+| [**PyQt6**](https://riverbankcomputing.com/software/pyqt/) | [Riverbank Computing](https://riverbankcomputing.com/) / [Qt Project](https://www.qt.io/) | Industrial desktop UI framework powering OXBROWSER's responsive dark-mode interface, docking layout, and controls. |
+| [**qasync**](https://github.com/CabbageDevelopment/qasync) | [@CabbageDevelopment](https://github.com/CabbageDevelopment) | Python `asyncio` event loop integration for Qt, enabling seamless concurrent asynchronous operations alongside the UI. |
+| [**ddddocr**](https://github.com/smarrmy/ddddocr) | [@smarrmy](https://github.com/smarrmy) | Fast neural OCR and visual classification library for solving optical captchas and verification challenges. |
+| [**faster-whisper**](https://github.com/SYSTRAN/faster-whisper) | [SYSTRAN](https://github.com/SYSTRAN) / [OpenAI](https://github.com/openai) | CTranslate2-accelerated implementation of OpenAI's Whisper model for rapid audio challenge transcription. |
+| [**Hugging Face Hub**](https://github.com/huggingface/huggingface_hub) | [Hugging Face](https://huggingface.co/) | Gateway for hosting, downloading, and running multimodal vision and reasoning models (SmolVLM, Florence-2, Qwen). |
+| [**cryptography**](https://github.com/pyca/cryptography) | [Python Cryptographic Authority (PyCA)](https://cryptography.io/) | Argon2id key derivation and AES-256-GCM authenticated zero-knowledge encryption for master vault security. |
+| [**aiohttp & aiohttp-socks**](https://github.com/aio-libs/aiohttp) | [aio-libs](https://github.com/aio-libs) | High-concurrency asynchronous HTTP networking and proxy routing engine (HTTP/SOCKS4/SOCKS5). |
 
 ---
 
